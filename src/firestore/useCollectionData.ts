@@ -1,6 +1,6 @@
 import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
-import { useQueriesEffect } from './useQueriesEffect';
+import { useQueriesEffect } from './useQueriesEffect.js';
 import type { Query } from 'firebase/firestore';
 
 export const useCollectionData = <T>(query?: Query<T> | null) => {

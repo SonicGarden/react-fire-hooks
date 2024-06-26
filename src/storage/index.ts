@@ -1,1 +1,1 @@
-export * from './useStorageUrl';
+export * from './useStorageUrl.js';

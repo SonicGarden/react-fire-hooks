@@ -1,6 +1,6 @@
 import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
-import { useRefsEffect } from './useRefsEffect';
+import { useRefsEffect } from './useRefsEffect.js';
 import type { DocumentReference } from 'firebase/firestore';
 
 export const useDocumentData = <T>(ref?: DocumentReference<T> | null) => {

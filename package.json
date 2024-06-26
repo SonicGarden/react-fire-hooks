@@ -3,13 +3,24 @@
   "type": "module",
   "version": "1.0.0",
   "description": "React hooks for Firebase",
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts"
+      }
+    }
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc --project tsconfig.cjs.json",
     "lint": "eslint --ext .js,.ts ./src",
     "lint:fix": "eslint --fix --ext .js,.ts ./src",
     "format": "prettier --write .",

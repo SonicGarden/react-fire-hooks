@@ -1,7 +1,7 @@
 import { limit, query } from 'firebase/firestore';
 import { useCallback, useMemo, useState } from 'react';
 import { useDeepCompareEffect } from 'react-use';
-import { useCollectionData } from './useCollectionData';
+import { useCollectionData } from './useCollectionData.js';
 import type { Query } from 'firebase/firestore';
 
 export const usePaginatedCollectionData = <T>(

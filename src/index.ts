@@ -1,3 +1,3 @@
-export * from './auth';
-export * from './firestore';
-export * from './storage';
+export * from './auth/index.js';
+export * from './firestore/index.js';
+export * from './storage/index.js';
