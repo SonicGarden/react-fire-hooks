@@ -5,7 +5,6 @@
   "description": "React hooks for Firebase",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
@@ -15,7 +14,8 @@
       "require": {
         "default": "./dist/cjs/index.js",
         "types": "./dist/cjs/index.d.ts"
-      }
+      },
+      "default": "./dist/cjs/index.js"
     }
   },
   "files": [
