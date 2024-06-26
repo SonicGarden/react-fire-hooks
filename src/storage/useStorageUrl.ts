@@ -1,6 +1,6 @@
 import { getBlob, getStorage, ref } from 'firebase/storage';
 import { useMemo } from 'react';
-import { useAsync } from 'react-use';
+import { useAsync } from '../utils/react-use.js';
 
 export const useStorageUrl = (path?: string | null) => {
   const url = useAsync(async () => {

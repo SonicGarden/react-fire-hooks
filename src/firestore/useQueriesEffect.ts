@@ -1,5 +1,5 @@
 import { queryEqual } from 'firebase/firestore';
-import { useCustomCompareEffect } from 'react-use';
+import { useCustomCompareEffect } from '../utils/react-use.js';
 import type { Query } from 'firebase/firestore';
 import type { EffectCallback } from 'react';
 

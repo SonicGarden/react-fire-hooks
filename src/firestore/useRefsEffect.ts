@@ -1,5 +1,5 @@
 import { refEqual } from 'firebase/firestore';
-import { useCustomCompareEffect } from 'react-use';
+import { useCustomCompareEffect } from '../utils/react-use.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type { EffectCallback } from 'react';
 
