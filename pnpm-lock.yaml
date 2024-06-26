@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      fast-deep-equal:
+        specifier: ^3.1.3
+        version: 3.1.3
       firebase:
         specifier: ^9.0.0 || next
         version: 9.23.0
