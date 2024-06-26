@@ -1,5 +1,6 @@
 import { refEqual } from 'firebase/firestore';
-import { useCustomCompareEffect } from '../utils/react-use.js';
+import { useCustomCompareEffect } from '../utils/index.js';
+import type { CustomCompareFn } from '../utils/index.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type { EffectCallback } from 'react';
 
@@ -10,5 +11,5 @@ const refsEqual = <T>(prevRefs: DocumentReference<T>[], refs: DocumentReference<
 };
 
 export const useRefsEffect = <T>(effect: EffectCallback, refs: DocumentReference<T>[]) => {
-  useCustomCompareEffect(effect, refs, refsEqual);
+  useCustomCompareEffect(effect, refs, refsEqual as CustomCompareFn);
 };

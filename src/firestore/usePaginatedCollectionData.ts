@@ -1,6 +1,6 @@
 import { limit, query } from 'firebase/firestore';
 import { useCallback, useMemo, useState } from 'react';
-import { useDeepCompareEffect } from 'react-use';
+import { useDeepCompareEffect } from '../utils/index.js';
 import { useCollectionData } from './useCollectionData.js';
 import type { Query } from 'firebase/firestore';
 

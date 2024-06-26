@@ -22,7 +22,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && tsc --project tsconfig.cjs.json",
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --project tsconfig.cjs.json",
     "lint": "eslint --ext .js,.ts ./src",
     "lint:fix": "eslint --fix --ext .js,.ts ./src",
     "format": "prettier --write .",
@@ -33,8 +35,7 @@
   "license": "ISC",
   "peerDependencies": {
     "firebase": "^9.0.0 || next",
-    "react": ">=16 || experimental",
-    "react-use": "*"
+    "react": ">=16 || experimental"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
