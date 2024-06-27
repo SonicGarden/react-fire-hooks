@@ -20,24 +20,24 @@ pnpm add @sonicgarden/react-fire-hooks
 
 ## Authentication
 
-- useAuth
+- [useAuth](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/auth/useAuth.ts)
 
 ## Firestore
 
-- useCollectionData
-- useDocumentData
-- usePaginatedCollectionData
-- useQueriesEffect
-- useRefsEffect
+- [useCollectionData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useCollectionData.ts)
+- [useDocumentData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentData.ts)
+- [usePaginatedCollectionData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionData.ts)
+- [useQueriesEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useQueriesEffect.ts)
+- [useRefsEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useRefsEffect.ts)
 
 ## Storage
 
-- useStorageUrl
+- [useStorageUrl](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/storage/useStorageUrl.ts)
 
-## Utilities
+## Utility
 
-- useCustomCompareEffect
-- useDeepCompareEffect
+- [useCustomCompareEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/utils/useCustomCompareEffect.ts)
+- [useDeepCompareEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/utils/useDeepCompareEffect.ts)
 
 # Publish
 
