@@ -24,7 +24,7 @@ export const useCollectionData = <T>(query?: Query<T> | null) => {
     );
 
     return () => unsubscribe();
-    // NOTE: queryがnullの場合にワーニングが出るので、空のオブジェクトを渡している
+    // NOTE: Since a warning is displayed when the query is null, an empty object is being passed.
   }, [query || ({} as Query<T>)]);
 
   return { data, loading };

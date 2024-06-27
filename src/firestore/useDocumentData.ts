@@ -27,7 +27,7 @@ export const useDocumentData = <T>(ref?: DocumentReference<T> | null) => {
     );
 
     return () => unsubscribe();
-    // NOTE: refがnullの場合にワーニングが出るので、空のオブジェクトを渡している
+    // NOTE: Since a warning is displayed when the ref is null, an empty object is being passed.
   }, [ref || ({} as DocumentReference<T>)]);
 
   return { data, loading };

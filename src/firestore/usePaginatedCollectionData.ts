@@ -12,13 +12,13 @@ export const usePaginatedCollectionData = <T>(
   const [data, setData] = useState<T[]>([]);
   const paginatedQuery = _query ? query(_query, limit(_limit * page + 1)) : null;
   const { data: _data, loading: _loading } = useCollectionData(paginatedQuery);
-  // NOTE: loadMoreのときに一時的に_dataが空になるので、その間はloadingをtrueにする
+  // NOTE: Since _data temporarily becomes empty during loadMore, set loading to true during that time.
   const loading = useMemo(() => _loading || (page > 1 && _data.length === 0), [_loading, page, _data.length]);
   const hasMore = data.length > _limit * page;
   const dataWithoutLast = useMemo(() => (hasMore ? data.slice(0, -1) : data), [data, hasMore]);
   const loadMore = useCallback(() => setPage((prev) => prev + 1), []);
 
-  // NOTE: loadMoreのときに一時的に_dataが空になるので、その間はdataを更新しない
+  // NOTE: Since _data temporarily becomes empty during loadMore, do not update data during that time.
   useDeepCompareEffect(() => {
     if (loading) return;
     setData(_data);
