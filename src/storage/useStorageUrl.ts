@@ -1,30 +1,15 @@
 import { getBlob, getStorage, ref } from 'firebase/storage';
-import { useEffect, useMemo, useState } from 'react';
+import { useAsync } from '../utils/index.js';
 
 export const useStorageUrl = (path?: string | null) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [url, setUrl] = useState<string | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
+  const { loading, data, error } = useAsync(async () => {
     if (!path) {
-      setUrl(null);
-      setError(null);
-      return;
+      return { url: null, blob: null };
     }
 
-    setLoading(true);
-    getBlob(ref(getStorage(), path))
-      .then((blob) => {
-        setUrl(URL.createObjectURL(blob));
-      })
-      .catch((error) => {
-        setError(error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const blob = await getBlob(ref(getStorage(), path));
+    return { url: URL.createObjectURL(blob), blob };
   }, [path]);
 
-  return useMemo(() => ({ loading, url, error }), [loading, url, error]);
+  return { loading, data, error };
 };

@@ -8,8 +8,10 @@ export const useDocumentData = <T>(ref?: DocumentReference<T> | null) => {
   const [loading, setLoading] = useState<boolean | undefined>();
 
   useRefsEffect(() => {
+    let mounted = true;
+
     if (!ref) {
-      setData(undefined);
+      mounted && setData(undefined);
       return;
     }
 
@@ -17,16 +19,19 @@ export const useDocumentData = <T>(ref?: DocumentReference<T> | null) => {
     const unsubscribe = onSnapshot(
       ref,
       (snapshot) => {
-        setData(snapshot.data());
-        setLoading(false);
+        mounted && setData(snapshot.data());
+        mounted && setLoading(false);
       },
       (error) => {
-        setLoading(false);
+        mounted && setLoading(false);
         throw error;
       },
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      mounted = false;
+    };
     // NOTE: Since a warning is displayed when the ref is null, an empty object is being passed.
   }, [ref || ({} as DocumentReference<T>)]);
 
