@@ -4,7 +4,7 @@ import { useAsync } from '../utils/index.js';
 export const useStorageUrl = (path?: string | null) => {
   const { loading, data, error } = useAsync(async () => {
     if (!path) {
-      return { url: null, blob: null };
+      return null;
     }
 
     const blob = await getBlob(ref(getStorage(), path));
