@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'react';
 import type { EffectCallback, DependencyList } from 'react';
 
-export type CustomCompareFn = (prevDeps: DependencyList, deps: DependencyList) => boolean;
+export type CustomCompareFunction = (prevDeps: DependencyList, deps: DependencyList) => boolean;
 
-export const useCustomCompareEffect = (effect: EffectCallback, deps: DependencyList, isEqual: CustomCompareFn) => {
+export const useCustomCompareEffect = (
+  effect: EffectCallback,
+  deps: DependencyList,
+  isEqual: CustomCompareFunction,
+) => {
   const ref = useRef<DependencyList>();
 
   if (!ref.current || !isEqual(deps, ref.current)) {
