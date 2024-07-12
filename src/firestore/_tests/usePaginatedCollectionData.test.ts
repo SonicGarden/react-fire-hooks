@@ -26,13 +26,13 @@ describe('usePaginatedCollectionData', async () => {
     await Promise.all([clearFirebase(), cleanup()]);
   });
 
-  it('データ取得中は空配列が返ってくる', () => {
+  it('returns an empty array while fetching data', () => {
     const { result } = renderHook(() => usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }));
     expect(result.current.loading).toBe(true);
     expect(result.current.data).toEqual([]);
   });
 
-  it('指定されたクエリのデータを取得する', async () => {
+  it('fetches data from the specified query', async () => {
     const { result, waitFor } = renderHook(() =>
       usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }),
     );
@@ -44,13 +44,13 @@ describe('usePaginatedCollectionData', async () => {
     });
   });
 
-  it('クエリがnullの場合は空配列が返ってくる', () => {
+  it('returns an empty array if the query is null', () => {
     const { result } = renderHook(() => usePaginatedCollectionData(null, { limit: 2 }));
     expect(result.current.loading).toBe(undefined);
     expect(result.current.data).toEqual([]);
   });
 
-  it('クエリが変わったらデータを再取得する', async () => {
+  it('refetches data when the query changes', async () => {
     const { result, waitFor, rerender } = renderHook(({ ref }) => usePaginatedCollectionData(ref, { limit: 2 }), {
       initialProps: { ref: query(fruitsRef(), orderBy('name')) },
     });
@@ -70,7 +70,7 @@ describe('usePaginatedCollectionData', async () => {
     });
   });
 
-  it('未取得のデータがない場合はhasMoreがfalseになる', async () => {
+  it('sets hasMore to false when there is no more data', async () => {
     const { result, waitFor } = renderHook(() =>
       usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 4 }),
     );
@@ -80,7 +80,7 @@ describe('usePaginatedCollectionData', async () => {
     });
   });
 
-  it('未取得のデータがある場合はhasMoreがtrueになる', async () => {
+  it('sets hasMore to true when there is more data', async () => {
     const { result, waitFor } = renderHook(() =>
       usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }),
     );
@@ -90,7 +90,7 @@ describe('usePaginatedCollectionData', async () => {
     });
   });
 
-  it('loadMoreを呼ぶとデータが追加される', async () => {
+  it('loads more data when loadMore is called', async () => {
     const { result, waitFor } = renderHook(() =>
       usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }),
     );

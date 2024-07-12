@@ -19,13 +19,13 @@ describe('useDocumentData', async () => {
     await Promise.all([clearFirebase(), cleanup()]);
   });
 
-  it('データ取得中はundefinedが返ってくる', () => {
+  it('returns undefined while fetching data', () => {
     const { result } = renderHook(() => useDocumentData(fruitRef('apple')));
     expect(result.current.loading).toBe(true);
     expect(result.current.data).toBe(undefined);
   });
 
-  it('指定されたリファレンスのデータを取得する', async () => {
+  it('fetches data from the specified reference', async () => {
     const { result, waitFor } = renderHook(() => useDocumentData(fruitRef('apple')));
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -33,13 +33,13 @@ describe('useDocumentData', async () => {
     });
   });
 
-  it('リファレンスがnullの場合はundefinedが返ってくる', () => {
+  it('returns undefined if the reference is null', () => {
     const { result } = renderHook(() => useDocumentData(null));
     expect(result.current.loading).toBe(undefined);
     expect(result.current.data).toBe(undefined);
   });
 
-  it('リファレンスが変わったらデータを再取得する', async () => {
+  it('refetches data when the reference changes', async () => {
     const { result, waitFor, rerender } = renderHook(({ ref }) => useDocumentData(ref), {
       initialProps: { ref: fruitRef('apple') },
     });

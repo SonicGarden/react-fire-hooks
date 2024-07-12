@@ -24,13 +24,13 @@ describe('useCollectionData', async () => {
     await Promise.all([clearFirebase(), cleanup()]);
   });
 
-  it('データ取得中は空配列が返ってくる', () => {
+  it('returns an empty array while fetching data', () => {
     const { result } = renderHook(() => useCollectionData(fruitsRef()));
     expect(result.current.loading).toBe(true);
     expect(result.current.data).toEqual([]);
   });
 
-  it('指定されたクエリのデータを取得する', async () => {
+  it('fetches data from the specified query', async () => {
     const { result, waitFor } = renderHook(() => useCollectionData(fruitsRef()));
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -40,13 +40,13 @@ describe('useCollectionData', async () => {
     });
   });
 
-  it('クエリがnullの場合は空配列が返ってくる', () => {
+  it('returns an empty array if the query is null', () => {
     const { result } = renderHook(() => useCollectionData(null));
     expect(result.current.loading).toBe(undefined);
     expect(result.current.data).toEqual([]);
   });
 
-  it('クエリが変わったらデータを再取得する', async () => {
+  it('refetches data when the query changes', async () => {
     const { result, waitFor, rerender } = renderHook(({ ref }) => useCollectionData(ref), {
       initialProps: { ref: fruitsRef() },
     });
