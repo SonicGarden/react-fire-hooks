@@ -1,0 +1,23 @@
+name: Test
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.X]
+        pnpm-version: [9]
+    steps:
+      - name: レポジトリのチェックアウト
+        uses: actions/checkout@v4
+      - name: Node.js ${{ matrix.node-version }} セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: pnpm ${{ matrix.pnpm-version }} セットアップ
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ matrix.pnpm-version }}
+          run_install: true
+      - name: テスト実行
+        run: pnpm emulators:exec:test
