@@ -1,19 +1,22 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { cleanup, renderHook } from '@testing-library/react-hooks';
 import { setDoc } from 'firebase/firestore';
-import { describe, beforeEach, afterEach, it, expect } from 'vitest';
+import { describe, beforeEach, afterEach, it, expect, beforeAll } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitRef } from '../../../tests/utils/firebase/firestore';
 
 describe('useDocumentData', async () => {
   const { useDocumentData } = await import('../useDocumentData');
 
-  beforeEach(async () => {
+  beforeAll(() => {
     initializeTestApp();
+  });
+
+  beforeEach(async () => {
     await Promise.all([setDoc(fruitRef('apple'), { name: 'apple' }), setDoc(fruitRef('banana'), { name: 'banana' })]);
   });
 
   afterEach(async () => {
-    await clearFirebase();
+    await Promise.all([clearFirebase(), cleanup()]);
   });
 
   it('データ取得中はundefinedが返ってくる', () => {
@@ -24,8 +27,8 @@ describe('useDocumentData', async () => {
 
   it('指定されたリファレンスのデータを取得する', async () => {
     const { result, waitFor } = renderHook(() => useDocumentData(fruitRef('apple')));
+    await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
       expect(result.current.data).toEqual({ name: 'apple' });
     });
   });
@@ -40,14 +43,15 @@ describe('useDocumentData', async () => {
     const { result, waitFor, rerender } = renderHook(({ ref }) => useDocumentData(ref), {
       initialProps: { ref: fruitRef('apple') },
     });
+    await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
       expect(result.current.data).toEqual({ name: 'apple' });
     });
 
     rerender({ ref: fruitRef('banana') });
+    await waitFor(() => expect(result.current.loading).toBe(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
       expect(result.current.data).toEqual({ name: 'banana' });
     });
   });
