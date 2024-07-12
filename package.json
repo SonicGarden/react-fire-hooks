@@ -28,6 +28,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/SonicGarden/react-fire-hooks.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SonicGarden/react-fire-hooks/issues"
+  },
+  "homepage": "https://github.com/SonicGarden/react-fire-hooks#readme",
   "peerDependencies": {
     "firebase": "^9.0.0 || next",
     "react": ">=16 || experimental"
