@@ -1,17 +1,17 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import { describe, afterEach, it, expect, vi, beforeAll } from 'vitest';
-import { initializeTestApp } from '../../../tests/utils/firebase/app';
+import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitRef } from '../../../tests/utils/firebase/firestore';
-import { useRefsEffect } from '../useRefsEffect';
 
-describe('useRefsEffect', () => {
+describe('useRefsEffect', async () => {
+  const { useRefsEffect } = await import('../useRefsEffect');
+
   beforeAll(() => {
     initializeTestApp();
   });
 
-  afterEach(() => {
-    cleanup();
-    vi.restoreAllMocks();
+  afterEach(async () => {
+    await Promise.all([clearFirebase(), cleanup(), vi.restoreAllMocks()]);
   });
 
   it('should not re-render if the ref content is the same', () => {

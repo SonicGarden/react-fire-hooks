@@ -1,6 +1,6 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import { setDoc } from 'firebase/firestore';
-import { describe, beforeEach, afterEach, it, expect, beforeAll } from 'vitest';
+import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitRef } from '../../../tests/utils/firebase/firestore';
 
@@ -16,7 +16,7 @@ describe('useDocumentData', async () => {
   });
 
   afterEach(async () => {
-    await Promise.all([clearFirebase(), cleanup()]);
+    await Promise.all([clearFirebase(), cleanup(), vi.restoreAllMocks()]);
   });
 
   it('returns undefined while fetching data', () => {

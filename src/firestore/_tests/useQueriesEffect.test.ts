@@ -1,18 +1,18 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import { query, where } from 'firebase/firestore';
 import { describe, afterEach, it, expect, vi, beforeAll } from 'vitest';
-import { initializeTestApp } from '../../../tests/utils/firebase/app';
+import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitsRef } from '../../../tests/utils/firebase/firestore';
-import { useQueriesEffect } from '../useQueriesEffect';
 
-describe('useQueriesEffect', () => {
+describe('useQueriesEffect', async () => {
+  const { useQueriesEffect } = await import('../useQueriesEffect');
+
   beforeAll(() => {
     initializeTestApp();
   });
 
-  afterEach(() => {
-    cleanup();
-    vi.restoreAllMocks();
+  afterEach(async () => {
+    await Promise.all([clearFirebase(), cleanup(), vi.restoreAllMocks()]);
   });
 
   it('should not re-render if the query content is the same', () => {

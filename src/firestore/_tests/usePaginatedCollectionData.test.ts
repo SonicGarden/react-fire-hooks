@@ -1,6 +1,6 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import { addDoc, orderBy, query } from 'firebase/firestore';
-import { describe, beforeEach, afterEach, it, expect, beforeAll } from 'vitest';
+import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
 
@@ -23,7 +23,7 @@ describe('usePaginatedCollectionData', async () => {
   });
 
   afterEach(async () => {
-    await Promise.all([clearFirebase(), cleanup()]);
+    await Promise.all([clearFirebase(), cleanup(), vi.restoreAllMocks()]);
   });
 
   it('returns an empty array while fetching data', () => {
