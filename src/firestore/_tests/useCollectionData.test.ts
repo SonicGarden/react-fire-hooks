@@ -66,4 +66,20 @@ describe('useCollectionData', async () => {
       expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'potato' }));
     });
   });
+
+  it('refetches data when the data is updated', async () => {
+    const { result, waitFor } = renderHook(() => useCollectionData(fruitsRef()));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'apple' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'banana' }));
+    });
+
+    await addDoc(fruitsRef(), { name: 'cherry' });
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(3);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'cherry' }));
+    });
+  });
 });

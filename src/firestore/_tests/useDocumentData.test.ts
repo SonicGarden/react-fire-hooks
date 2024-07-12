@@ -1,5 +1,5 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
-import { setDoc } from 'firebase/firestore';
+import { setDoc, updateDoc } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitRef } from '../../../tests/utils/firebase/firestore';
@@ -53,6 +53,19 @@ describe('useDocumentData', async () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
       expect(result.current.data).toEqual({ name: 'banana' });
+    });
+  });
+
+  it('refetches data when the data is updated', async () => {
+    const { result, waitFor } = renderHook(() => useDocumentData(fruitRef('apple')));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ name: 'apple' });
+    });
+
+    await updateDoc(fruitRef('apple'), { color: 'red' });
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ name: 'apple', color: 'red' });
     });
   });
 });
