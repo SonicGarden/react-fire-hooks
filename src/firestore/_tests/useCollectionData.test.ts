@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks';
-import { addDoc, collection, getFirestore } from 'firebase/firestore';
+import { addDoc } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
@@ -22,7 +22,7 @@ describe('useCollectionData', async () => {
   });
 
   it('データ取得中は空配列が返ってくる', () => {
-    const { result } = renderHook(() => useCollectionData(collection(getFirestore(), 'fruits')));
+    const { result } = renderHook(() => useCollectionData(fruitsRef()));
     expect(result.current.loading).toBe(true);
     expect(result.current.data).toEqual([]);
   });

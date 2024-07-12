@@ -26,7 +26,7 @@
     "lint:fix": "eslint --fix --ext .js,.ts ./src",
     "format": "prettier --write .",
     "prepare": "npm run build",
-    "test": "vitest run"
+    "test": "vitest run --pool threads"
   },
   "keywords": [],
   "author": "",
