@@ -17,15 +17,12 @@ export const useDocumentsDataOnce = <T>(refs: DocumentReference<T>[] | null) => 
     setLoading(true);
     Promise.all(refs.map((ref) => getDoc(ref)))
       .then((snapshots) => {
-        if (isMounted) {
-          setData(snapshots.map((snapshot) => snapshot.data()));
-          setLoading(false);
-        }
+        if (!isMounted) return;
+        setData(snapshots.map((snapshot) => snapshot.data()));
+        setLoading(false);
       })
       .catch((error) => {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
         throw error;
       });
 

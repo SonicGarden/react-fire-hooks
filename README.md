@@ -28,10 +28,10 @@ pnpm add @sonicgarden/react-fire-hooks
 - [useCollectionDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useCollectionDataOnce.ts)
 - [useDocumentData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentData.ts)
 - [useDocumentDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentDataOnce.ts)
-- [usePaginatedCollectionData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionData.ts)
-- [usePaginatedCollectionDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionDataOnce.ts)
 - [useDocumentsData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentsData.ts)
 - [useDocumentsDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentsDataOnce.ts)
+- [usePaginatedCollectionData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionData.ts)
+- [usePaginatedCollectionDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionDataOnce.ts)
 - [useQueriesEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useQueriesEffect.ts)
 - [useRefsEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useRefsEffect.ts)
 

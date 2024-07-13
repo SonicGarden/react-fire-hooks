@@ -8,22 +8,27 @@ export const useCollectionData = <T>(query?: Query<T> | null) => {
   const [loading, setLoading] = useState<boolean | undefined>();
 
   useQueriesEffect(() => {
+    let isMounted = true;
     if (!query) return;
 
     setLoading(true);
     const unsubscribe = onSnapshot(
       query,
       (snapshot) => {
+        if (!isMounted) return;
         setData(snapshot.docs.map((doc) => doc.data()));
         setLoading(false);
       },
       (error) => {
-        setLoading(false);
+        if (isMounted) setLoading(false);
         throw error;
       },
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      isMounted = false;
+    };
     // NOTE: Since a warning is displayed when the query is null, an empty object is being passed.
   }, [query || ({} as Query<T>)]);
 

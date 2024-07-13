@@ -26,5 +26,5 @@ export const useStorageUrl = (path?: string | null) => {
       });
   }, [path]);
 
-  return useMemo(() => ({ loading, url, error }), [loading, url, error]);
+  return { loading, url, error };
 };

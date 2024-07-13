@@ -8,6 +8,7 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null) => {
   const [loading, setLoading] = useState<boolean | undefined>();
 
   useRefsEffect(() => {
+    let isMounted = true;
     if (!refs || refs.length === 0) {
       setData([]);
       return;
@@ -20,15 +21,16 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null) => {
         const unsubscribe = onSnapshot(
           ref,
           (snapshot) => {
-            setData((prevData) => {
-              const newData = [...prevData];
-              newData[index] = snapshot.data();
-              return newData;
-            });
+            if (isMounted)
+              setData((prevData) => {
+                const newData = [...prevData];
+                newData[index] = snapshot.data();
+                return newData;
+              });
             resolve();
           },
           (error) => {
-            setLoading(false);
+            if (isMounted) setLoading(false);
             throw error;
           },
         );
@@ -40,7 +42,10 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null) => {
       setLoading(false);
     });
 
-    return () => unsubscribes.forEach((unsubscribe) => unsubscribe());
+    return () => {
+      unsubscribes.forEach((unsubscribe) => unsubscribe());
+      isMounted = false;
+    };
   }, refs || []);
 
   return { data, loading };
