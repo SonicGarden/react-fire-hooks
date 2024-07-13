@@ -1,5 +1,5 @@
 import { getBlob, getStorage, ref } from 'firebase/storage';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useStorageUrl = (path?: string | null) => {
   const [loading, setLoading] = useState<boolean>(false);
