@@ -31,6 +31,7 @@ pnpm add @sonicgarden/react-fire-hooks
 - [usePaginatedCollectionData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionData.ts)
 - [usePaginatedCollectionDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/usePaginatedCollectionDataOnce.ts)
 - [useDocumentsData](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentsData.ts)
+- [useDocumentsDataOnce](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useDocumentsDataOnce.ts)
 - [useQueriesEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useQueriesEffect.ts)
 - [useRefsEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/firestore/useRefsEffect.ts)
 
