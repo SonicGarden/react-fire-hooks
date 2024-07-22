@@ -13,15 +13,20 @@ export const useAuth = () => {
   }, [loading, claims]);
 
   useEffect(() => {
+    let isMounted = true;
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!isMounted) return;
       setLoading(true);
       setUser(user);
       const result = user && (await getIdTokenResult(user, true));
       setClaims(result?.claims || null);
       setLoading(false);
     });
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      isMounted = false;
+    };
   }, []);
 
   return { user, claims, loading, signedIn };

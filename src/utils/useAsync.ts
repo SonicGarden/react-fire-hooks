@@ -7,21 +7,21 @@ export const useAsync = <T>(fn: () => T | Promise<T>, deps: DependencyList = [])
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
 
     try {
       (async () => {
         const _data = await fn();
-        mounted && setData(_data);
+        isMounted && setData(_data);
       })();
     } catch (error) {
-      mounted && setError(error);
+      isMounted && setError(error);
     } finally {
-      mounted && setLoading(false);
+      isMounted && setLoading(false);
     }
 
     return () => {
-      mounted = false;
+      isMounted = false;
     };
   }, deps);
 

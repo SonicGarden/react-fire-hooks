@@ -1,35 +1,32 @@
-import { onSnapshot } from 'firebase/firestore';
+import { getDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
 import type { DocumentReference } from 'firebase/firestore';
 
-export const useDocumentData = <T>(ref?: DocumentReference<T> | null) => {
+export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
 
   useRefsEffect(() => {
     let isMounted = true;
     if (!ref) {
-      isMounted && setData(undefined);
+      setData(undefined);
       return;
     }
 
     setLoading(true);
-    const unsubscribe = onSnapshot(
-      ref,
-      (snapshot) => {
+    getDoc(ref)
+      .then((snapshot) => {
         if (!isMounted) return;
         setData(snapshot.data());
         setLoading(false);
-      },
-      (error) => {
+      })
+      .catch((error) => {
         if (isMounted) setLoading(false);
         throw error;
-      },
-    );
+      });
 
     return () => {
-      unsubscribe();
       isMounted = false;
     };
     // NOTE: Since a warning is displayed when the ref is null, an empty object is being passed.

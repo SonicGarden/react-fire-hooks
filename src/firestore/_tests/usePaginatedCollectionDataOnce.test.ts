@@ -4,8 +4,8 @@ import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vite
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
 
-describe('usePaginatedCollectionData', async () => {
-  const { usePaginatedCollectionData } = await import('../usePaginatedCollectionData');
+describe('usePaginatedCollectionDataOnce', async () => {
+  const { usePaginatedCollectionDataOnce } = await import('../usePaginatedCollectionDataOnce');
 
   beforeAll(() => {
     initializeTestApp();
@@ -27,14 +27,16 @@ describe('usePaginatedCollectionData', async () => {
   });
 
   it('returns an empty array while fetching data', () => {
-    const { result } = renderHook(() => usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }));
+    const { result } = renderHook(() =>
+      usePaginatedCollectionDataOnce(query(fruitsRef(), orderBy('name')), { limit: 2 }),
+    );
     expect(result.current.loading).toBe(true);
     expect(result.current.data).toEqual([]);
   });
 
   it('fetches data from the specified query', async () => {
     const { result, waitFor } = renderHook(() =>
-      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }),
+      usePaginatedCollectionDataOnce(query(fruitsRef(), orderBy('name')), { limit: 2 }),
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -45,13 +47,13 @@ describe('usePaginatedCollectionData', async () => {
   });
 
   it('returns an empty array if the query is null', () => {
-    const { result } = renderHook(() => usePaginatedCollectionData(null, { limit: 2 }));
+    const { result } = renderHook(() => usePaginatedCollectionDataOnce(null, { limit: 2 }));
     expect(result.current.loading).toBe(undefined);
     expect(result.current.data).toEqual([]);
   });
 
   it('refetches data when the query changes', async () => {
-    const { result, waitFor, rerender } = renderHook(({ ref }) => usePaginatedCollectionData(ref, { limit: 2 }), {
+    const { result, waitFor, rerender } = renderHook(({ ref }) => usePaginatedCollectionDataOnce(ref, { limit: 2 }), {
       initialProps: { ref: query(fruitsRef(), orderBy('name')) },
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -72,7 +74,7 @@ describe('usePaginatedCollectionData', async () => {
 
   it('sets hasMore to false when there is no more data', async () => {
     const { result, waitFor } = renderHook(() =>
-      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 4 }),
+      usePaginatedCollectionDataOnce(query(fruitsRef(), orderBy('name')), { limit: 4 }),
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -82,7 +84,7 @@ describe('usePaginatedCollectionData', async () => {
 
   it('sets hasMore to true when there is more data', async () => {
     const { result, waitFor } = renderHook(() =>
-      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }),
+      usePaginatedCollectionDataOnce(query(fruitsRef(), orderBy('name')), { limit: 2 }),
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -92,7 +94,7 @@ describe('usePaginatedCollectionData', async () => {
 
   it('loads more data when loadMore is called', async () => {
     const { result, waitFor } = renderHook(() =>
-      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 2 }),
+      usePaginatedCollectionDataOnce(query(fruitsRef(), orderBy('name')), { limit: 2 }),
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -107,9 +109,9 @@ describe('usePaginatedCollectionData', async () => {
     });
   });
 
-  it('refetches data when the data is updated', async () => {
+  it('does not refetch data when the data is updated', async () => {
     const { result, waitFor } = renderHook(() =>
-      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), { limit: 10 }),
+      usePaginatedCollectionDataOnce(query(fruitsRef(), orderBy('name')), { limit: 10 }),
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
@@ -122,8 +124,7 @@ describe('usePaginatedCollectionData', async () => {
 
     await addDoc(fruitsRef(), { name: 'elderberry' });
     await waitFor(() => {
-      expect(result.current.data.length).toBe(5);
-      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'elderberry' }));
+      expect(result.current.data.length).toBe(4);
     });
   });
 });
