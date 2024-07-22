@@ -3,6 +3,7 @@ import { getApps, initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
+import { initializeTestAdminApp } from './admin';
 
 const PROJECT_ID = 'demo-project';
 const HOST = '127.0.0.1';
@@ -13,6 +14,11 @@ const STORAGE_PORT = 9199;
 const initializeTestApp = () => {
   if (getApps().length !== 0) return getApps()[0];
 
+  process.env.GCLOUD_PROJECT = PROJECT_ID;
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = `${HOST}:${AUTH_PORT}`;
+  process.env.FIRESTORE_EMULATOR_HOST = `${HOST}:${FIRESTORE_PORT}`;
+  process.env.FIREBASE_STORAGE_EMULATOR_HOST = `${HOST}:${STORAGE_PORT}`;
+  const adminApp = initializeTestAdminApp();
   const app = initializeApp({
     apiKey: 'demo-api-key',
     authDomain: '',
@@ -24,7 +30,7 @@ const initializeTestApp = () => {
   connectAuthEmulator(getAuth(), `http://${HOST}:${AUTH_PORT}`, { disableWarnings: true });
   connectFirestoreEmulator(getFirestore(), HOST, FIRESTORE_PORT);
   connectStorageEmulator(getStorage(), HOST, STORAGE_PORT);
-  return app;
+  return { app, adminApp };
 };
 
 const clearFirestore = async () => {
