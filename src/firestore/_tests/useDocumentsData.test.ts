@@ -1,5 +1,5 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
-import { setDoc, updateDoc } from 'firebase/firestore';
+import { serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitRef } from '../../../tests/utils/firebase/firestore';
@@ -76,6 +76,34 @@ describe('useDocumentsData', async () => {
     await updateDoc(fruitRef('apple'), { color: 'red' });
     await waitFor(() => {
       expect(result.current.data).toEqual([{ name: 'apple', color: 'red' }, { name: 'banana' }]);
+    });
+  });
+
+  it('returns a Timestamp object for server timestamps when serverTimestamps is set to "estimate"', async () => {
+    const { result, waitFor } = renderHook(() =>
+      useDocumentsData([fruitRef('apple')], { snapshotOptions: { serverTimestamps: 'estimate' } }),
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual([{ name: 'apple' }]);
+    });
+
+    await updateDoc(fruitRef('apple'), { updatedAt: serverTimestamp() });
+    await waitFor(() => {
+      expect(result.current.data?.find((_) => _?.name === 'apple')?.updatedAt).toBeInstanceOf(Timestamp);
+    });
+  });
+
+  it('returns null for server timestamps when snapshotOptions is not specified', async () => {
+    const { result, waitFor } = renderHook(() => useDocumentsData([fruitRef('apple')]));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual([{ name: 'apple' }]);
+    });
+
+    await updateDoc(fruitRef('apple'), { updatedAt: serverTimestamp() });
+    await waitFor(() => {
+      expect(result.current.data?.find((_) => _?.name === 'apple')?.updatedAt).toBe(null);
     });
   });
 });

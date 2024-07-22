@@ -1,5 +1,5 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
-import { addDoc } from 'firebase/firestore';
+import { addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
@@ -80,6 +80,32 @@ describe('useCollectionData', async () => {
     await waitFor(() => {
       expect(result.current.data.length).toBe(3);
       expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'cherry' }));
+    });
+  });
+
+  it('returns a Timestamp object for server timestamps when serverTimestamps is set to "estimate"', async () => {
+    const { result, waitFor } = renderHook(() =>
+      useCollectionData(fruitsRef(), { snapshotOptions: { serverTimestamps: 'estimate' } }),
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await addDoc(fruitsRef(), { name: 'cherry', createdAt: serverTimestamp() });
+
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(3);
+      expect(result.current.data.find(({ name }) => name === 'cherry')?.createdAt).toBeInstanceOf(Timestamp);
+    });
+  });
+
+  it('returns null for server timestamps when snapshotOptions is not specified', async () => {
+    const { result, waitFor } = renderHook(() => useCollectionData(fruitsRef()));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await addDoc(fruitsRef(), { name: 'cherry', createdAt: serverTimestamp() });
+
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(3);
+      expect(result.current.data.find(({ name }) => name === 'cherry')?.createdAt).toBe(null);
     });
   });
 });

@@ -1,9 +1,13 @@
 import { getDocs } from 'firebase/firestore';
 import { useState } from 'react';
 import { useQueriesEffect } from './useQueriesEffect.js';
-import type { Query } from 'firebase/firestore';
+import type { Query, SnapshotOptions } from 'firebase/firestore';
 
-export const useCollectionDataOnce = <T>(query?: Query<T> | null) => {
+export type UseCollectionDataOnceOptions = {
+  snapshotOptions?: SnapshotOptions;
+};
+
+export const useCollectionDataOnce = <T>(query?: Query<T> | null, options?: UseCollectionDataOnceOptions) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
 
@@ -15,7 +19,7 @@ export const useCollectionDataOnce = <T>(query?: Query<T> | null) => {
     getDocs(query)
       .then((snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.docs.map((doc) => doc.data()));
+        setData(snapshot.docs.map((doc) => doc.data(options?.snapshotOptions)));
         setLoading(false);
       })
       .catch((error) => {

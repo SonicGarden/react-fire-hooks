@@ -1,9 +1,13 @@
 import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
-import type { DocumentReference, Unsubscribe } from 'firebase/firestore';
+import type { DocumentReference, SnapshotOptions, Unsubscribe } from 'firebase/firestore';
 
-export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null) => {
+export type UseDocumentsDataOptions = {
+  snapshotOptions?: SnapshotOptions;
+};
+
+export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, options?: UseDocumentsDataOptions) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
 
@@ -24,7 +28,7 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null) => {
             if (isMounted)
               setData((prevData) => {
                 const newData = [...prevData];
-                newData[index] = snapshot.data();
+                newData[index] = snapshot.data(options?.snapshotOptions);
                 return newData;
               });
             resolve();
