@@ -136,10 +136,11 @@ describe('usePaginatedCollectionData', async () => {
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    await addDoc(fruitsRef(), { name: 'cherry', createdAt: serverTimestamp() });
+    await addDoc(fruitsRef(), { name: 'elderberry', createdAt: serverTimestamp() });
 
     await waitFor(() => {
-      expect(result.current.data.find(({ name }) => name === 'cherry')?.createdAt).toBeInstanceOf(Timestamp);
+      expect(result.current.data.length).toBe(5);
+      expect(result.current.data.find(({ name }) => name === 'elderberry')?.createdAt).toBeInstanceOf(Timestamp);
     });
   });
 
@@ -151,10 +152,11 @@ describe('usePaginatedCollectionData', async () => {
     );
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    await addDoc(fruitsRef(), { name: 'cherry', createdAt: serverTimestamp() });
+    await addDoc(fruitsRef(), { name: 'elderberry', createdAt: serverTimestamp() });
 
     await waitFor(() => {
-      expect(result.current.data.find(({ name }) => name === 'cherry')?.createdAt).toBe(null);
+      expect(result.current.data.length).toBe(5);
+      expect(result.current.data.find(({ name }) => name === 'elderberry')?.createdAt).toBe(null);
     });
   });
 });
