@@ -13,7 +13,10 @@ export const usePaginatedCollectionData = <T>(
   const paginatedQuery = _query ? query(_query, limit(_limit * page + 1)) : null;
   const { data: _data, loading: _loading } = useCollectionData(paginatedQuery);
   // NOTE: Since _data temporarily becomes empty during loadMore, set loading to true during that time.
-  const loading = useMemo(() => _loading || (page > 1 && _data.length === 0), [_loading, page, _data.length]);
+  const loading = useMemo(
+    () => (_loading === undefined ? undefined : _loading || (page > 1 && _data.length === 0)),
+    [_loading, page, _data.length],
+  );
   const hasMore = data.length > _limit * page;
   const dataWithoutLast = useMemo(() => (hasMore ? data.slice(0, -1) : data), [data, hasMore]);
   const loadMore = useCallback(() => setPage((prev) => prev + 1), []);
