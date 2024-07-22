@@ -10,7 +10,7 @@ export const useDocumentData = <T>(ref?: DocumentReference<T> | null) => {
   useRefsEffect(() => {
     let isMounted = true;
     if (!ref) {
-      setData(undefined);
+      isMounted && setData(undefined);
       return;
     }
 

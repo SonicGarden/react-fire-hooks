@@ -41,6 +41,7 @@ pnpm add @sonicgarden/react-fire-hooks
 
 ## Utility
 
+- [useAsync](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/utils/useAsync.ts)
 - [useCustomCompareEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/utils/useCustomCompareEffect.ts)
 - [useDeepCompareEffect](https://github.com/SonicGarden/react-fire-hooks/blob/main/src/utils/useDeepCompareEffect.ts)
 
