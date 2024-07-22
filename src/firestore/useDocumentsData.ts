@@ -34,7 +34,6 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
             resolve();
           },
           (error) => {
-            if (isMounted) setLoading(false);
             throw error;
           },
         );
@@ -42,8 +41,8 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
       });
     });
 
-    Promise.all(fetchDataPromises).then(() => {
-      setLoading(false);
+    Promise.all(fetchDataPromises).finally(() => {
+      if (isMounted) setLoading(false);
     });
 
     return () => {
