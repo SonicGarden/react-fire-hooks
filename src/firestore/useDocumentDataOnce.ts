@@ -1,9 +1,13 @@
 import { getDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
-import type { DocumentReference } from 'firebase/firestore';
+import type { DocumentReference, SnapshotOptions } from 'firebase/firestore';
 
-export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null) => {
+export type UseDocumentDataOnceOptions = {
+  snapshotOptions?: SnapshotOptions;
+};
+
+export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null, options?: UseDocumentDataOnceOptions) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
 
@@ -18,7 +22,7 @@ export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null) => {
     getDoc(ref)
       .then((snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.data());
+        setData(snapshot.data(options?.snapshotOptions));
         setLoading(false);
       })
       .catch((error) => {

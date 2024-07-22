@@ -1,5 +1,5 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
-import { addDoc, orderBy, query } from 'firebase/firestore';
+import { addDoc, orderBy, query, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
@@ -124,6 +124,39 @@ describe('usePaginatedCollectionData', async () => {
     await waitFor(() => {
       expect(result.current.data.length).toBe(5);
       expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'elderberry' }));
+    });
+  });
+
+  it('returns a Timestamp object for server timestamps when serverTimestamps is set to "estimate"', async () => {
+    const { result, waitFor } = renderHook(() =>
+      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), {
+        limit: 10,
+        snapshotOptions: { serverTimestamps: 'estimate' },
+      }),
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await addDoc(fruitsRef(), { name: 'elderberry', createdAt: serverTimestamp() });
+
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(5);
+      expect(result.current.data.find(({ name }) => name === 'elderberry')?.createdAt).toBeInstanceOf(Timestamp);
+    });
+  });
+
+  it('returns null for server timestamps when snapshotOptions is not specified', async () => {
+    const { result, waitFor } = renderHook(() =>
+      usePaginatedCollectionData(query(fruitsRef(), orderBy('name')), {
+        limit: 10,
+      }),
+    );
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await addDoc(fruitsRef(), { name: 'elderberry', createdAt: serverTimestamp() });
+
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(5);
+      expect(result.current.data.find(({ name }) => name === 'elderberry')?.createdAt).toBe(null);
     });
   });
 });
