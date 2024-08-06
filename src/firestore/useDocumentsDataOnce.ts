@@ -7,7 +7,10 @@ export type UseDocumentsDataOnceOptions = {
   snapshotOptions?: SnapshotOptions;
 };
 
-export const useDocumentsDataOnce = <T>(refs: DocumentReference<T>[] | null, options?: UseDocumentsDataOnceOptions) => {
+export const useDocumentsDataOnce = <T>(
+  refs?: DocumentReference<T>[] | null,
+  options?: UseDocumentsDataOnceOptions,
+) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
 
