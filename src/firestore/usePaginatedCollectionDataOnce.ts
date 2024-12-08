@@ -8,6 +8,7 @@ export type UsePaginatedCollectionDataOnceOptions = {
   limit?: number;
   defaultPage?: number;
   snapshotOptions?: SnapshotOptions;
+  throwError?: boolean;
 };
 
 export const usePaginatedCollectionDataOnce = <T>(
@@ -17,7 +18,7 @@ export const usePaginatedCollectionDataOnce = <T>(
   const [page, setPage] = useState(defaultPage);
   const [data, setData] = useState<T[]>([]);
   const paginatedQuery = _query ? query(_query, limit(_limit * page + 1)) : null;
-  const { data: _data, loading: _loading } = useCollectionDataOnce(paginatedQuery, options);
+  const { data: _data, loading: _loading, error } = useCollectionDataOnce(paginatedQuery, options);
   // NOTE: Since _data temporarily becomes empty during loadMore, set loading to true during that time.
   const loading = useMemo(
     () => (_loading === undefined ? undefined : _loading || (page > 1 && _data.length === 0)),
@@ -33,5 +34,5 @@ export const usePaginatedCollectionDataOnce = <T>(
     setData(_data);
   }, [loading, _data]);
 
-  return { data: dataWithoutLast, loading, hasMore, loadMore };
+  return { data: dataWithoutLast, loading, hasMore, loadMore, error };
 };

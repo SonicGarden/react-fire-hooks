@@ -1,8 +1,9 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
+import { FirebaseError } from 'firebase/app';
 import { addDoc, orderBy, query } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
-import { fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
+import { animalsRef, fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
 
 describe('usePaginatedCollectionDataOnce', async () => {
   const { usePaginatedCollectionDataOnce } = await import('../usePaginatedCollectionDataOnce');
@@ -126,5 +127,11 @@ describe('usePaginatedCollectionDataOnce', async () => {
     await waitFor(() => {
       expect(result.current.data.length).toBe(4);
     });
+  });
+
+  it('got an error when the query is invalid', async () => {
+    const { result, waitFor } = renderHook(() => usePaginatedCollectionDataOnce(animalsRef(), { throwError: false }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
   });
 });

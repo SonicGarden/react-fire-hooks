@@ -1,15 +1,18 @@
 import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
+import type { FirebaseError } from 'firebase/app';
 import type { DocumentReference, SnapshotOptions, Unsubscribe } from 'firebase/firestore';
 
 export type UseDocumentsDataOptions = {
   snapshotOptions?: SnapshotOptions;
+  throwError?: boolean;
 };
 
 export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, options?: UseDocumentsDataOptions) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
+  const [errors, setErrors] = useState<FirebaseError[]>([]);
 
   useRefsEffect(() => {
     let isMounted = true;
@@ -34,7 +37,9 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
             resolve();
           },
           (error) => {
-            throw error;
+            setErrors([...(errors ?? []), error]);
+            if (isMounted) setLoading(false);
+            if (options?.throwError ?? true) throw error;
           },
         );
         unsubscribes.push(unsubscribe);
@@ -51,5 +56,5 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
     };
   }, refs || []);
 
-  return { data, loading };
+  return { data, loading, errors };
 };
