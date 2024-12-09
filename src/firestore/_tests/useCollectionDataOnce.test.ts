@@ -82,6 +82,7 @@ describe('useCollectionDataOnce', async () => {
     await setTimeout(1000);
     expect(result.current.data.length).toBe(2);
   });
+
   it('got an error when the query is invalid', async () => {
     const { result, waitFor } = renderHook(() => useCollectionDataOnce(animalsRef(), { throwError: false }));
     await waitFor(() => expect(result.current.loading).toBe(false));
