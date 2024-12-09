@@ -11,7 +11,7 @@ export type UseDocumentsDataOnceOptions = {
 
 export const useDocumentsDataOnce = <T>(
   refs?: DocumentReference<T>[] | null,
-  options?: UseDocumentsDataOnceOptions,
+  options: UseDocumentsDataOnceOptions = { throwError: true },
 ) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
@@ -28,13 +28,16 @@ export const useDocumentsDataOnce = <T>(
     Promise.all(refs.map((ref) => getDoc(ref)))
       .then((snapshots) => {
         if (!isMounted) return;
-        setData(snapshots.map((snapshot) => snapshot.data(options?.snapshotOptions)));
+        setData(snapshots.map((snapshot) => snapshot.data(options.snapshotOptions)));
         setLoading(false);
       })
       .catch((error) => {
+        if (options.throwError) throw error;
+        if (!isMounted) {
+          return;
+        }
         setErrors([...(errors ?? []), error]);
-        if (isMounted) setLoading(false);
-        if (options?.throwError ?? true) throw error;
+        setLoading(false);
       });
 
     return () => {

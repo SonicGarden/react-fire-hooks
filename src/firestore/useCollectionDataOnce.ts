@@ -9,7 +9,10 @@ export type UseCollectionDataOnceOptions = {
   throwError?: boolean;
 };
 
-export const useCollectionDataOnce = <T>(query?: Query<T> | null, options?: UseCollectionDataOnceOptions) => {
+export const useCollectionDataOnce = <T>(
+  query?: Query<T> | null,
+  options: UseCollectionDataOnceOptions = { throwError: true },
+) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirebaseError | undefined>();
@@ -22,13 +25,14 @@ export const useCollectionDataOnce = <T>(query?: Query<T> | null, options?: UseC
     getDocs(query)
       .then((snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.docs.map((doc) => doc.data(options?.snapshotOptions)));
+        setData(snapshot.docs.map((doc) => doc.data(options.snapshotOptions)));
         setLoading(false);
       })
       .catch((error) => {
+        if (options.throwError) throw error;
+        if (!isMounted) return;
         setError(error);
-        if (isMounted) setLoading(false);
-        if (options?.throwError ?? true) throw error;
+        setLoading(false);
       });
 
     return () => {

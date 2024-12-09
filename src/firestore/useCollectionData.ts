@@ -2,14 +2,17 @@ import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
 import { useQueriesEffect } from './useQueriesEffect.js';
 import type { FirebaseError } from 'firebase/app';
-import type { FirestoreError, Query, SnapshotOptions } from 'firebase/firestore';
+import type { Query, SnapshotOptions } from 'firebase/firestore';
 
 export type UseCollectionDataOptions = {
   snapshotOptions?: SnapshotOptions;
   throwError?: boolean;
 };
 
-export const useCollectionData = <T>(query?: Query<T> | null, options?: UseCollectionDataOptions) => {
+export const useCollectionData = <T>(
+  query?: Query<T> | null,
+  options: UseCollectionDataOptions = { throwError: true },
+) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirebaseError | undefined>();
@@ -23,13 +26,14 @@ export const useCollectionData = <T>(query?: Query<T> | null, options?: UseColle
       query,
       (snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.docs.map((doc) => doc.data(options?.snapshotOptions)));
+        setData(snapshot.docs.map((doc) => doc.data(options.snapshotOptions)));
         setLoading(false);
       },
       (error) => {
+        if (options.throwError) throw error;
+        if (!isMounted) return;
         setError(error);
-        if (isMounted) setLoading(false);
-        if (options?.throwError ?? true) throw error;
+        setLoading(false);
       },
     );
 

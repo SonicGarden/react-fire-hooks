@@ -8,7 +8,12 @@ export type UseDocumentDataOptions = {
   throwError?: boolean;
 };
 
-export const useDocumentData = <T>(ref?: DocumentReference<T> | null, options?: UseDocumentDataOptions) => {
+export const useDocumentData = <T>(
+  ref?: DocumentReference<T> | null,
+  options: UseDocumentDataOptions = {
+    throwError: true,
+  },
+) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirestoreError | undefined>();
@@ -25,13 +30,14 @@ export const useDocumentData = <T>(ref?: DocumentReference<T> | null, options?: 
       ref,
       (snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.data(options?.snapshotOptions));
+        setData(snapshot.data(options.snapshotOptions));
         setLoading(false);
       },
       (error) => {
+        if (options.throwError) throw error;
+        if (!isMounted) return;
         setError(error);
-        if (isMounted) setLoading(false);
-        if (options?.throwError ?? true) throw error;
+        setLoading(false);
       },
     );
 

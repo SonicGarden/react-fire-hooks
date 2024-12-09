@@ -9,7 +9,10 @@ export type UseDocumentsDataOptions = {
   throwError?: boolean;
 };
 
-export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, options?: UseDocumentsDataOptions) => {
+export const useDocumentsData = <T>(
+  refs?: DocumentReference<T>[] | null,
+  options: UseDocumentsDataOptions = { throwError: true },
+) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
   const [errors, setErrors] = useState<FirebaseError[]>([]);
@@ -24,22 +27,27 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
     setLoading(true);
     const unsubscribes: Unsubscribe[] = [];
     const fetchDataPromises = refs.map((ref, index) => {
-      return new Promise<void>((resolve) => {
+      return new Promise<void>((resolve, reject) => {
         const unsubscribe = onSnapshot(
           ref,
           (snapshot) => {
             if (isMounted)
               setData((prevData) => {
                 const newData = [...prevData];
-                newData[index] = snapshot.data(options?.snapshotOptions);
+                newData[index] = snapshot.data(options.snapshotOptions);
                 return newData;
               });
             resolve();
           },
           (error) => {
+            if (options.throwError) reject(error);
+            if (!isMounted) {
+              resolve();
+              return;
+            }
             setErrors([...(errors ?? []), error]);
-            if (isMounted) setLoading(false);
-            if (options?.throwError ?? true) throw error;
+            setLoading(false);
+            resolve();
           },
         );
         unsubscribes.push(unsubscribe);

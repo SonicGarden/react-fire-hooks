@@ -9,7 +9,10 @@ export type UseDocumentDataOnceOptions = {
   throwError?: boolean;
 };
 
-export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null, options?: UseDocumentDataOnceOptions) => {
+export const useDocumentDataOnce = <T>(
+  ref?: DocumentReference<T> | null,
+  options: UseDocumentDataOnceOptions = { throwError: true },
+) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirebaseError | undefined>();
@@ -25,13 +28,13 @@ export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null, option
     getDoc(ref)
       .then((snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.data(options?.snapshotOptions));
+        setData(snapshot.data(options.snapshotOptions));
         setLoading(false);
       })
       .catch((error) => {
         setError(error);
         if (isMounted) setLoading(false);
-        if (options?.throwError ?? true) throw error;
+        if (options.throwError) throw error;
       });
 
     return () => {
