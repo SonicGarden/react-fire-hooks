@@ -10,9 +10,7 @@ export type UseDocumentDataOptions = {
 
 export const useDocumentData = <T>(
   ref?: DocumentReference<T> | null,
-  options: UseDocumentDataOptions = {
-    throwError: true,
-  },
+  { snapshotOptions, throwError = true }: UseDocumentDataOptions = {},
 ) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
@@ -30,11 +28,11 @@ export const useDocumentData = <T>(
       ref,
       (snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.data(options.snapshotOptions));
+        setData(snapshot.data(snapshotOptions));
         setLoading(false);
       },
       (error) => {
-        if (options.throwError) throw error;
+        if (throwError) throw error;
         if (!isMounted) return;
         setError(error);
         setLoading(false);

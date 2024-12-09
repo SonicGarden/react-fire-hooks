@@ -11,7 +11,7 @@ export type UseDocumentsDataOptions = {
 
 export const useDocumentsData = <T>(
   refs?: DocumentReference<T>[] | null,
-  options: UseDocumentsDataOptions = { throwError: true },
+  { snapshotOptions, throwError = true }: UseDocumentsDataOptions = {},
 ) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
@@ -34,19 +34,17 @@ export const useDocumentsData = <T>(
             if (isMounted)
               setData((prevData) => {
                 const newData = [...prevData];
-                newData[index] = snapshot.data(options.snapshotOptions);
+                newData[index] = snapshot.data(snapshotOptions);
                 return newData;
               });
             resolve();
           },
           (error) => {
-            if (options.throwError) reject(error);
-            if (!isMounted) {
-              resolve();
-              return;
+            if (throwError) reject(error);
+            if (isMounted) {
+              setErrors((prev) => [...prev, error]);
+              setLoading(false);
             }
-            setErrors([...(errors ?? []), error]);
-            setLoading(false);
             resolve();
           },
         );

@@ -11,7 +11,7 @@ export type UseDocumentDataOnceOptions = {
 
 export const useDocumentDataOnce = <T>(
   ref?: DocumentReference<T> | null,
-  options: UseDocumentDataOnceOptions = { throwError: true },
+  { snapshotOptions, throwError = true }: UseDocumentDataOnceOptions = {},
 ) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
@@ -28,13 +28,13 @@ export const useDocumentDataOnce = <T>(
     getDoc(ref)
       .then((snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.data(options.snapshotOptions));
+        setData(snapshot.data(snapshotOptions));
         setLoading(false);
       })
       .catch((error) => {
         setError(error);
         if (isMounted) setLoading(false);
-        if (options.throwError) throw error;
+        if (throwError) throw error;
       });
 
     return () => {

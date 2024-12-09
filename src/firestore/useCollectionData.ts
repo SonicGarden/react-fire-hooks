@@ -11,7 +11,7 @@ export type UseCollectionDataOptions = {
 
 export const useCollectionData = <T>(
   query?: Query<T> | null,
-  options: UseCollectionDataOptions = { throwError: true },
+  { snapshotOptions, throwError = true }: UseCollectionDataOptions = {},
 ) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
@@ -26,11 +26,11 @@ export const useCollectionData = <T>(
       query,
       (snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.docs.map((doc) => doc.data(options.snapshotOptions)));
+        setData(snapshot.docs.map((doc) => doc.data(snapshotOptions)));
         setLoading(false);
       },
       (error) => {
-        if (options.throwError) throw error;
+        if (throwError) throw error;
         if (!isMounted) return;
         setError(error);
         setLoading(false);
