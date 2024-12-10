@@ -5,7 +5,6 @@ import { addDoc } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { animalsRef, fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
-import { useCollectionData } from '../useCollectionData';
 
 describe('useCollectionDataOnce', async () => {
   const { useCollectionDataOnce } = await import('../useCollectionDataOnce');
