@@ -32,9 +32,10 @@ export const useDocumentDataOnce = <T>(
         setLoading(false);
       })
       .catch((error) => {
-        setError(error);
-        if (isMounted) setLoading(false);
         if (throwError) throw error;
+        if (!isMounted) return;
+        setError(error);
+        setLoading(false);
       });
 
     return () => {
