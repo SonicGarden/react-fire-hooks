@@ -1,9 +1,10 @@
 import { setTimeout } from 'timers/promises';
 import { cleanup, renderHook } from '@testing-library/react-hooks';
-import { setDoc, updateDoc } from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
-import { fruitRef } from '../../../tests/utils/firebase/firestore';
+import { animalsRef, fruitRef } from '../../../tests/utils/firebase/firestore';
 
 describe('useDocumentDataOnce', async () => {
   const { useDocumentDataOnce } = await import('../useDocumentDataOnce');
@@ -66,5 +67,11 @@ describe('useDocumentDataOnce', async () => {
     await updateDoc(fruitRef('apple'), { color: 'red' });
     await setTimeout(1000);
     expect(result.current.data).toEqual({ name: 'apple' });
+  });
+
+  it('got an error when the query is invalid', async () => {
+    const { result, waitFor } = renderHook(() => useDocumentDataOnce(doc(animalsRef(), 'cat'), { throwError: false }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
   });
 });

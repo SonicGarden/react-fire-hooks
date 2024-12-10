@@ -1,15 +1,21 @@
 import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
+import type { FirebaseError } from 'firebase/app';
 import type { DocumentReference, SnapshotOptions, Unsubscribe } from 'firebase/firestore';
 
 export type UseDocumentsDataOptions = {
   snapshotOptions?: SnapshotOptions;
+  throwError?: boolean;
 };
 
-export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, options?: UseDocumentsDataOptions) => {
+export const useDocumentsData = <T>(
+  refs?: DocumentReference<T>[] | null,
+  { snapshotOptions, throwError = true }: UseDocumentsDataOptions = {},
+) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
+  const [errors, setErrors] = useState<FirebaseError[]>([]);
 
   useRefsEffect(() => {
     let isMounted = true;
@@ -21,20 +27,25 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
     setLoading(true);
     const unsubscribes: Unsubscribe[] = [];
     const fetchDataPromises = refs.map((ref, index) => {
-      return new Promise<void>((resolve) => {
+      return new Promise<void>((resolve, reject) => {
         const unsubscribe = onSnapshot(
           ref,
           (snapshot) => {
             if (isMounted)
               setData((prevData) => {
                 const newData = [...prevData];
-                newData[index] = snapshot.data(options?.snapshotOptions);
+                newData[index] = snapshot.data(snapshotOptions);
                 return newData;
               });
             resolve();
           },
           (error) => {
-            throw error;
+            if (throwError) reject(error);
+            if (isMounted) {
+              setErrors((prev) => [...prev, error]);
+              setLoading(false);
+            }
+            resolve();
           },
         );
         unsubscribes.push(unsubscribe);
@@ -51,5 +62,5 @@ export const useDocumentsData = <T>(refs?: DocumentReference<T>[] | null, option
     };
   }, refs || []);
 
-  return { data, loading };
+  return { data, loading, errors };
 };

@@ -1,15 +1,21 @@
 import { getDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
+import type { FirebaseError } from 'firebase/app';
 import type { DocumentReference, SnapshotOptions } from 'firebase/firestore';
 
 export type UseDocumentDataOnceOptions = {
   snapshotOptions?: SnapshotOptions;
+  throwError?: boolean;
 };
 
-export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null, options?: UseDocumentDataOnceOptions) => {
+export const useDocumentDataOnce = <T>(
+  ref?: DocumentReference<T> | null,
+  { snapshotOptions, throwError = true }: UseDocumentDataOnceOptions = {},
+) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
+  const [error, setError] = useState<FirebaseError | undefined>();
 
   useRefsEffect(() => {
     let isMounted = true;
@@ -22,12 +28,14 @@ export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null, option
     getDoc(ref)
       .then((snapshot) => {
         if (!isMounted) return;
-        setData(snapshot.data(options?.snapshotOptions));
+        setData(snapshot.data(snapshotOptions));
         setLoading(false);
       })
       .catch((error) => {
-        if (isMounted) setLoading(false);
-        throw error;
+        if (throwError) throw error;
+        if (!isMounted) return;
+        setError(error);
+        setLoading(false);
       });
 
     return () => {
@@ -36,5 +44,5 @@ export const useDocumentDataOnce = <T>(ref?: DocumentReference<T> | null, option
     // NOTE: Since a warning is displayed when the ref is null, an empty object is being passed.
   }, [ref || ({} as DocumentReference<T>)]);
 
-  return { data, loading };
+  return { data, loading, error };
 };

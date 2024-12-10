@@ -1,18 +1,21 @@
 import { getDoc } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
+import type { FirebaseError } from 'firebase/app';
 import type { DocumentReference, SnapshotOptions } from 'firebase/firestore';
 
 export type UseDocumentsDataOnceOptions = {
   snapshotOptions?: SnapshotOptions;
+  throwError?: boolean;
 };
 
 export const useDocumentsDataOnce = <T>(
   refs?: DocumentReference<T>[] | null,
-  options?: UseDocumentsDataOnceOptions,
+  { snapshotOptions, throwError = true }: UseDocumentsDataOnceOptions = {},
 ) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
+  const [errors, setErrors] = useState<FirebaseError[]>([]);
 
   useRefsEffect(() => {
     let isMounted = true;
@@ -25,12 +28,14 @@ export const useDocumentsDataOnce = <T>(
     Promise.all(refs.map((ref) => getDoc(ref)))
       .then((snapshots) => {
         if (!isMounted) return;
-        setData(snapshots.map((snapshot) => snapshot.data(options?.snapshotOptions)));
+        setData(snapshots.map((snapshot) => snapshot.data(snapshotOptions)));
         setLoading(false);
       })
       .catch((error) => {
-        if (isMounted) setLoading(false);
-        throw error;
+        if (throwError) throw error;
+        if (!isMounted) return;
+        setErrors((prev) => [...prev, error]);
+        setLoading(false);
       });
 
     return () => {
@@ -38,5 +43,5 @@ export const useDocumentsDataOnce = <T>(
     };
   }, refs || []);
 
-  return { data, loading };
+  return { data, loading, errors };
 };
