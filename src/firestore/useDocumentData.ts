@@ -1,7 +1,8 @@
 import { onSnapshot } from 'firebase/firestore';
 import { useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
-import type { DocumentReference, FirestoreError, SnapshotOptions } from 'firebase/firestore';
+import type { FirebaseError } from 'firebase/app';
+import type { DocumentReference, SnapshotOptions } from 'firebase/firestore';
 
 export type UseDocumentDataOptions = {
   snapshotOptions?: SnapshotOptions;
@@ -14,7 +15,7 @@ export const useDocumentData = <T>(
 ) => {
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
-  const [error, setError] = useState<FirestoreError | undefined>();
+  const [error, setError] = useState<FirebaseError | undefined>();
 
   useRefsEffect(() => {
     let isMounted = true;

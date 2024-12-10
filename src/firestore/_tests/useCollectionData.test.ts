@@ -1,6 +1,6 @@
 import { cleanup, renderHook } from '@testing-library/react-hooks';
 import { FirebaseError } from 'firebase/app';
-import { addDoc, FirestoreError, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { describe, beforeEach, afterEach, it, expect, beforeAll, vi } from 'vitest';
 import { clearFirebase, initializeTestApp } from '../../../tests/utils/firebase/app';
 import { animalsRef, fruitsRef, vegetablesRef } from '../../../tests/utils/firebase/firestore';
