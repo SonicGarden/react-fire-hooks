@@ -39,12 +39,6 @@ describe('useDocumentsDataOnce', async () => {
     });
   });
 
-  it('returns an empty array if the references array is null', () => {
-    const { result } = renderHook(() => useDocumentsDataOnce(null));
-    expect(result.current.loading).toBe(undefined);
-    expect(result.current.data).toEqual([]);
-  });
-
   it('returns an empty array if the references array is empty', () => {
     const { result } = renderHook(() => useDocumentsDataOnce([]));
     expect(result.current.loading).toBe(undefined);

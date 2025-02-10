@@ -38,14 +38,8 @@ describe('useDocumentsData', async () => {
     });
   });
 
-  it('returns an empty array if refs is empty', () => {
+  it('returns an empty array if refs is empty array', () => {
     const { result } = renderHook(() => useDocumentsData([]));
-    expect(result.current.loading).toBe(undefined);
-    expect(result.current.data).toEqual([]);
-  });
-
-  it('returns undefined if refs is null', () => {
-    const { result } = renderHook(() => useDocumentsData(null));
     expect(result.current.loading).toBe(undefined);
     expect(result.current.data).toEqual([]);
   });
@@ -64,6 +58,20 @@ describe('useDocumentsData', async () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     await waitFor(() => {
       expect(result.current.data).toEqual([{ name: 'banana' }, { name: 'orange' }]);
+    });
+  });
+
+  it('clears data when the references change to empty array', async () => {
+    const { result, waitFor, rerender } = renderHook(({ refs }) => useDocumentsData(refs), {
+      initialProps: { refs: [fruitRef('apple'), fruitRef('banana')] },
+    });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+    expect(result.current.data).toEqual([{ name: 'apple' }, { name: 'banana' }]);
+    rerender({ refs: [] });
+    await waitFor(() => {
+      expect(result.current.data).toEqual([]);
     });
   });
 

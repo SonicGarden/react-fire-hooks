@@ -10,7 +10,7 @@ export type UseDocumentsDataOnceOptions = {
 };
 
 export const useDocumentsDataOnce = <T>(
-  refs?: DocumentReference<T>[] | null,
+  refs: DocumentReference<T>[],
   { snapshotOptions, throwError = true }: UseDocumentsDataOnceOptions = {},
 ) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
@@ -20,7 +20,7 @@ export const useDocumentsDataOnce = <T>(
   useRefsEffect(() => {
     let isMounted = true;
     if (!refs || refs.length === 0) {
-      setData([]);
+      isMounted && setData([]);
       return;
     }
 
@@ -41,7 +41,7 @@ export const useDocumentsDataOnce = <T>(
     return () => {
       isMounted = false;
     };
-  }, refs || []);
+  }, refs);
 
   return { data, loading, errors };
 };

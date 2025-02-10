@@ -47,6 +47,21 @@ describe('useRefsEffect', async () => {
     expect(effect).toHaveBeenCalledTimes(2);
   });
 
+  it('should not re-render if the ref content changes from null to null', () => {
+    const effect = vi.fn();
+    const { rerender } = renderHook(
+      ({ refs }) => {
+        useRefsEffect(effect, refs);
+      },
+      { initialProps: { refs: [null] } },
+    );
+
+    expect(effect).toHaveBeenCalledTimes(1);
+
+    rerender({ refs: [null] });
+    expect(effect).toHaveBeenCalledTimes(1);
+  });
+
   it('should handle empty refs array', () => {
     const effect = vi.fn();
     const { rerender } = renderHook(() => useRefsEffect(effect, []));

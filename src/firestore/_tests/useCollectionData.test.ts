@@ -68,6 +68,26 @@ describe('useCollectionData', async () => {
     });
   });
 
+  it('clear data when the query changes to null', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionData>[0] },
+      ReturnType<typeof useCollectionData>
+    >(({ ref }) => useCollectionData(ref), {
+      initialProps: { ref: fruitsRef() },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'apple' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'banana' }));
+    });
+
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(0);
+    });
+  });
+
   it('refetches data when the data is updated', async () => {
     const { result, waitFor } = renderHook(() => useCollectionData(fruitsRef()));
     await waitFor(() => expect(result.current.loading).toBe(false));

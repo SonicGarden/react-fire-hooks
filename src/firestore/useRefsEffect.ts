@@ -4,12 +4,17 @@ import type { CustomCompareFunction } from '../utils/index.js';
 import type { DocumentReference } from 'firebase/firestore';
 import type { EffectCallback } from 'react';
 
-const refsEqual = <T>([prevRefs]: DocumentReference<T>[][], [refs]: DocumentReference<T>[][]) => {
+type Ref<T> = DocumentReference<T> | null | undefined;
+
+const refsEqual = <T>([prevRefs]: Ref<T>[][], [refs]: Ref<T>[][]) => {
   if (prevRefs.length !== refs.length) return false;
 
-  return prevRefs.every((prev, i) => refEqual(prev, refs[i] as DocumentReference<T>));
+  return prevRefs.every((prev, i) => {
+    const current = refs[i];
+    return prev ? refEqual(prev, current!) : prev == current;
+  });
 };
 
-export const useRefsEffect = <T>(effect: EffectCallback, refs: DocumentReference<T>[]) => {
+export const useRefsEffect = <T>(effect: EffectCallback, refs: Ref<T>[]) => {
   useCustomCompareEffect(effect, [refs], refsEqual as CustomCompareFunction);
 };

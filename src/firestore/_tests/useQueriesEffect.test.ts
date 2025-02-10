@@ -45,6 +45,21 @@ describe('useQueriesEffect', async () => {
     expect(effect).toHaveBeenCalledTimes(2);
   });
 
+  it('should not re-render if the query content changes from null to null', () => {
+    const effect = vi.fn();
+    const { rerender } = renderHook(
+      ({ queries }) => {
+        useQueriesEffect(effect, queries);
+      },
+      { initialProps: { queries: [null] } },
+    );
+
+    expect(effect).toHaveBeenCalledTimes(1);
+
+    rerender({ queries: [null] });
+    expect(effect).toHaveBeenCalledTimes(1);
+  });
+
   it('should handle empty queries array', () => {
     const effect = vi.fn();
     const { rerender } = renderHook(() => useQueriesEffect(effect, []));

@@ -57,6 +57,21 @@ describe('useDocumentData', async () => {
     });
   });
 
+  it('clears data when the document reference changes to undefined', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useDocumentData>[0] | null },
+      ReturnType<typeof useDocumentData>
+    >(({ ref }) => useDocumentData(ref), { initialProps: { ref: fruitRef('apple') } });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+    expect(result.current.data).toEqual({ name: 'apple' });
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.data).toBe(undefined);
+    });
+  });
+
   it('refetches data when the data is updated', async () => {
     const { result, waitFor } = renderHook(() => useDocumentData(fruitRef('apple')));
     await waitFor(() => expect(result.current.loading).toBe(false));
