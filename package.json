@@ -1,7 +1,7 @@
 {
   "name": "@sonicgarden/react-fire-hooks",
   "type": "module",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "React hooks for Firebase",
   "main": "dist/cjs/index.js",
   "module": "dist/index.js",
