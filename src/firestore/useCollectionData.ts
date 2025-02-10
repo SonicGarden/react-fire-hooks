@@ -19,7 +19,10 @@ export const useCollectionData = <T>(
 
   useQueriesEffect(() => {
     let isMounted = true;
-    if (!query) return;
+    if (!query) {
+      isMounted && setData([]);
+      return;
+    }
 
     setLoading(true);
     const unsubscribe = onSnapshot(
@@ -41,8 +44,7 @@ export const useCollectionData = <T>(
       unsubscribe();
       isMounted = false;
     };
-    // NOTE: Since a warning is displayed when the query is null, an empty object is being passed.
-  }, [query || ({} as Query<T>)]);
+  }, [query]);
 
   return { data, loading, error };
 };

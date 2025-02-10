@@ -20,7 +20,7 @@ export const useDocumentDataOnce = <T>(
   useRefsEffect(() => {
     let isMounted = true;
     if (!ref) {
-      setData(undefined);
+      isMounted && setData(undefined);
       return;
     }
 
@@ -41,8 +41,7 @@ export const useDocumentDataOnce = <T>(
     return () => {
       isMounted = false;
     };
-    // NOTE: Since a warning is displayed when the ref is null, an empty object is being passed.
-  }, [ref || ({} as DocumentReference<T>)]);
+  }, [ref]);
 
   return { data, loading, error };
 };

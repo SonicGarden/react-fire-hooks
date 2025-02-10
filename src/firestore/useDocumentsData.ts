@@ -10,7 +10,7 @@ export type UseDocumentsDataOptions = {
 };
 
 export const useDocumentsData = <T>(
-  refs?: DocumentReference<T>[] | null,
+  refs: DocumentReference<T>[],
   { snapshotOptions, throwError = true }: UseDocumentsDataOptions = {},
 ) => {
   const [data, setData] = useState<(T | undefined)[]>([]);
@@ -20,7 +20,7 @@ export const useDocumentsData = <T>(
   useRefsEffect(() => {
     let isMounted = true;
     if (!refs || refs.length === 0) {
-      setData([]);
+      isMounted && setData([]);
       return;
     }
 
@@ -60,7 +60,7 @@ export const useDocumentsData = <T>(
       unsubscribes.forEach((unsubscribe) => unsubscribe());
       isMounted = false;
     };
-  }, refs || []);
+  }, refs);
 
   return { data, loading, errors };
 };

@@ -44,8 +44,7 @@ export const useDocumentData = <T>(
       unsubscribe();
       isMounted = false;
     };
-    // NOTE: Since a warning is displayed when the ref is null, an empty object is being passed.
-  }, [ref || ({} as DocumentReference<T>)]);
+  }, [ref]);
 
   return { data, loading, error };
 };

@@ -12,7 +12,7 @@ export type UsePaginatedCollectionDataOnceOptions = {
 };
 
 export const usePaginatedCollectionDataOnce = <T>(
-  _query: Query<T> | null,
+  _query: Query<T> | null | undefined,
   { limit: _limit = 20, defaultPage = 1, throwError = true, ...options }: UsePaginatedCollectionDataOnceOptions = {},
 ) => {
   const [page, setPage] = useState(defaultPage);
