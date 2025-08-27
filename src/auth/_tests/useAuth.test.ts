@@ -56,4 +56,17 @@ describe('useAuth', async () => {
     await getAuth().signOut();
     await waitFor(() => expect(result.current.signedIn).toBe(false));
   });
+
+  it('sets cookie when withCookie is true', async () => {
+    const { result, waitFor } = renderHook(() => useAuth({ withCookie: true }));
+    await signInWithEmailAndPassword(getAuth(), 'test@example.com', 'password');
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(document.cookie).toContain('__session=');
+    });
+    await getAuth().signOut();
+    await waitFor(() => {
+      expect(document.cookie).not.toContain('__session=');
+    });
+  });
 });
