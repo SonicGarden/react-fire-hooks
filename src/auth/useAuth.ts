@@ -32,7 +32,7 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
           if (!isMounted) return;
           if (withCookie) {
             if (user) {
-              Cookies.set(cookieKeyName, await user.getIdToken(), { path: cookiePath });
+              Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
             } else {
               Cookies.remove(cookieKeyName, { path: cookiePath });
             }
