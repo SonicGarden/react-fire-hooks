@@ -1,23 +1,7 @@
-import { getAuth, getIdTokenResult, onIdTokenChanged } from 'firebase/auth';
+import { getAuth, getIdTokenResult, onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
+import Cookies from 'js-cookie';
 import { useState, useEffect, useMemo } from 'react';
 import type { User, ParsedToken } from 'firebase/auth';
-import Cookies from 'js-cookie';
-
-const isEqualUser = (a: User | null | undefined, b: User | null | undefined) => {
-  if (a !== b) return false;
-  if (a === null && b === null) return true;
-  if (a === undefined && b === undefined) return true;
-  if (a?.displayName !== b?.displayName) return false;
-  if (a?.email !== b?.email) return false;
-  if (a?.emailVerified !== b?.emailVerified) return false;
-  if (a?.isAnonymous !== b?.isAnonymous) return false;
-  if (a?.phoneNumber !== b?.phoneNumber) return false;
-  if (a?.photoURL !== b?.photoURL) return false;
-  if (a?.providerId !== b?.providerId) return false;
-  if (a?.tenantId !== b?.tenantId) return false;
-  if (a?.uid !== b?.uid) return false;
-  return true;
-};
 
 export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string; cookiePath?: string }) => {
   const { withCookie = false, cookieKeyName = '__session', cookiePath = '/' } = options || {};
@@ -34,19 +18,14 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
   useEffect(() => {
     let isMounted = true;
     const auth = getAuth();
-    const unsubscribe = onIdTokenChanged(auth, async (_user) => {
+    const authStateUnsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!isMounted) return;
       setLoading(true);
-      if (!isEqualUser(user, _user)) {
-        setUser(_user);
-      }
-      const result = _user && (await getIdTokenResult(_user, true));
-
-      if (!isEqualUser(user, _user) || JSON.stringify(result?.claims) !== JSON.stringify(claims)) {
-        setClaims(result?.claims || null);
-      }
+      setUser(user);
+      const result = user && (await getIdTokenResult(user, true));
+      setClaims(result?.claims || null);
       if (withCookie) {
-        if (_user && result?.token) {
+        if (user && result?.token) {
           Cookies.set(cookieKeyName, result.token, { path: cookiePath });
         } else {
           Cookies.remove(cookieKeyName, { path: cookiePath });
@@ -54,8 +33,29 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
       }
       setLoading(false);
     });
+
+    const idTokenUnsubscribe = withCookie
+      ? onIdTokenChanged(auth, async (user) => {
+          if (!isMounted) return;
+          setLoading(true);
+          setUser(user);
+          const result = user && (await getIdTokenResult(user, true));
+
+          setClaims(result?.claims || null);
+          if (withCookie) {
+            if (user && result?.token) {
+              Cookies.set(cookieKeyName, result.token, { path: cookiePath });
+            } else {
+              Cookies.remove(cookieKeyName, { path: cookiePath });
+            }
+          }
+          setLoading(false);
+        })
+      : undefined;
+
     return () => {
-      unsubscribe();
+      authStateUnsubscribe();
+      idTokenUnsubscribe?.();
       isMounted = false;
     };
   }, []);
