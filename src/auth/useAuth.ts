@@ -24,32 +24,19 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
       setUser(user);
       const result = user && (await getIdTokenResult(user, true));
       setClaims(result?.claims || null);
-      if (withCookie) {
-        if (user && result?.token) {
-          Cookies.set(cookieKeyName, result.token, { path: cookiePath });
-        } else {
-          Cookies.remove(cookieKeyName, { path: cookiePath });
-        }
-      }
       setLoading(false);
     });
 
     const idTokenUnsubscribe = withCookie
       ? onIdTokenChanged(auth, async (user) => {
           if (!isMounted) return;
-          setLoading(true);
-          setUser(user);
-          const result = user && (await getIdTokenResult(user, true));
-
-          setClaims(result?.claims || null);
           if (withCookie) {
-            if (user && result?.token) {
-              Cookies.set(cookieKeyName, result.token, { path: cookiePath });
+            if (user) {
+              Cookies.set(cookieKeyName, await user.getIdToken(), { path: cookiePath });
             } else {
               Cookies.remove(cookieKeyName, { path: cookiePath });
             }
           }
-          setLoading(false);
         })
       : undefined;
 
