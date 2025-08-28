@@ -27,18 +27,16 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
       setLoading(false);
     });
 
-    const idTokenUnsubscribe = withCookie
-      ? onIdTokenChanged(auth, async (user) => {
-          if (!isMounted) return;
-          if (withCookie) {
-            if (user) {
-              Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
-            } else {
-              Cookies.remove(cookieKeyName, { path: cookiePath });
-            }
-          }
-        })
-      : undefined;
+    const idTokenUnsubscribe =
+      (withCookie || undefined) &&
+      onIdTokenChanged(auth, async (user) => {
+        if (!isMounted) return;
+        if (user) {
+          Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
+        } else {
+          Cookies.remove(cookieKeyName, { path: cookiePath });
+        }
+      });
 
     return () => {
       authStateUnsubscribe();
