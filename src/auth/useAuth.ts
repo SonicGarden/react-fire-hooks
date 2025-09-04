@@ -1,8 +1,11 @@
-import { getAuth, getIdTokenResult, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, getIdTokenResult, onAuthStateChanged, onIdTokenChanged } from 'firebase/auth';
+import Cookies from 'js-cookie';
 import { useState, useEffect, useMemo } from 'react';
 import type { User, ParsedToken } from 'firebase/auth';
 
-export const useAuth = () => {
+export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string; cookiePath?: string }) => {
+  const { withCookie = false, cookieKeyName = '__session', cookiePath = '/' } = options || {};
+
   const [user, setUser] = useState<User | null | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
   const [claims, setClaims] = useState<ParsedToken | null | undefined>();
@@ -15,7 +18,7 @@ export const useAuth = () => {
   useEffect(() => {
     let isMounted = true;
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const authStateUnsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!isMounted) return;
       setLoading(true);
       setUser(user);
@@ -23,8 +26,21 @@ export const useAuth = () => {
       setClaims(result?.claims || null);
       setLoading(false);
     });
+
+    const idTokenUnsubscribe =
+      (withCookie || undefined) &&
+      onIdTokenChanged(auth, async (user) => {
+        if (!isMounted) return;
+        if (user) {
+          Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
+        } else {
+          Cookies.remove(cookieKeyName, { path: cookiePath });
+        }
+      });
+
     return () => {
-      unsubscribe();
+      authStateUnsubscribe();
+      idTokenUnsubscribe?.();
       isMounted = false;
     };
   }, []);
