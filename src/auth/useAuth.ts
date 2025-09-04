@@ -9,6 +9,10 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
   const [user, setUser] = useState<User | null | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
   const [claims, setClaims] = useState<ParsedToken | null | undefined>();
+  const [hasCookie, setHasCookie] = useState<boolean>(() => {
+    if (!withCookie) return false;
+    return !!Cookies.get(cookieKeyName);
+  });
   const signedIn = useMemo(() => {
     if (loading) return undefined;
     if (claims === undefined) return undefined;
@@ -33,8 +37,10 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
         if (!isMounted) return;
         if (user) {
           Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
+          setHasCookie(true);
         } else {
           Cookies.remove(cookieKeyName, { path: cookiePath });
+          setHasCookie(false);
         }
       });
 
@@ -45,5 +51,5 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
     };
   }, []);
 
-  return { user, claims, loading, signedIn };
+  return { user, claims, loading, signedIn, hasCookie };
 };
