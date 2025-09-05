@@ -16,8 +16,8 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
   const signedIn = useMemo(() => {
     if (loading) return undefined;
     if (claims === undefined) return undefined;
-    return !!claims;
-  }, [loading, claims]);
+    return !!claims && (withCookie ? hasCookie : true);
+  }, [loading, claims, hasCookie]);
 
   useEffect(() => {
     let isMounted = true;
