@@ -9,11 +9,15 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
   const [user, setUser] = useState<User | null | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
   const [claims, setClaims] = useState<ParsedToken | null | undefined>();
+  const [hasCookie, setHasCookie] = useState<boolean>(() => {
+    if (!withCookie) return false;
+    return !!Cookies.get(cookieKeyName);
+  });
   const signedIn = useMemo(() => {
     if (loading) return undefined;
     if (claims === undefined) return undefined;
-    return !!claims;
-  }, [loading, claims]);
+    return !!claims && (withCookie ? hasCookie : true);
+  }, [loading, claims, hasCookie]);
 
   useEffect(() => {
     let isMounted = true;
@@ -27,16 +31,18 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
       setLoading(false);
     });
 
-    const idTokenUnsubscribe =
-      (withCookie || undefined) &&
-      onIdTokenChanged(auth, async (user) => {
-        if (!isMounted) return;
-        if (user) {
-          Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
-        } else {
-          Cookies.remove(cookieKeyName, { path: cookiePath });
-        }
-      });
+    const idTokenUnsubscribe = withCookie
+      ? onIdTokenChanged(auth, async (user) => {
+          if (!isMounted) return;
+          if (user) {
+            Cookies.set(cookieKeyName, await user.getIdToken(true), { path: cookiePath });
+            setHasCookie(true);
+          } else {
+            Cookies.remove(cookieKeyName, { path: cookiePath });
+            setHasCookie(false);
+          }
+        })
+      : undefined;
 
     return () => {
       authStateUnsubscribe();
@@ -45,5 +51,5 @@ export const useAuth = (options?: { withCookie?: boolean; cookieKeyName?: string
     };
   }, []);
 
-  return { user, claims, loading, signedIn };
+  return { user, claims, loading, signedIn, hasCookie };
 };
