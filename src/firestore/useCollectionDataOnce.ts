@@ -17,6 +17,25 @@ export const useCollectionDataOnce = <T>(
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirebaseError | undefined>();
 
+  const refetch = () => {
+    if (loading) return;
+    setLoading(true);
+    setError(undefined);
+    if (!query) {
+      return;
+    }
+    getDocs(query)
+      .then((snapshot) => {
+        setData(snapshot.docs.map((doc) => doc.data(snapshotOptions)));
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (throwError) throw error;
+        setError(error);
+        setLoading(false);
+      });
+  };
+
   useQueriesEffect(() => {
     let isMounted = true;
     if (!query) {
@@ -43,5 +62,5 @@ export const useCollectionDataOnce = <T>(
     };
   }, [query]);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch };
 };

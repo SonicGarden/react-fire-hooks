@@ -32,6 +32,30 @@ describe('useCollectionDataOnce', async () => {
     expect(result.current.data).toEqual([]);
   });
 
+  it('refreshes the data manually', async () => {
+    const { result, waitFor } = renderHook(() => useCollectionDataOnce(fruitsRef()));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'apple' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'banana' }));
+    });
+
+    await addDoc(fruitsRef(), { name: 'cherry' });
+
+    expect(result.current.data.length).toBe(2);
+
+    result.current.refetch();
+    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(3);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'apple' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'banana' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'cherry' }));
+    });
+  });
+
   it('fetches data from the specified query', async () => {
     const { result, waitFor } = renderHook(() => useCollectionDataOnce(fruitsRef()));
     await waitFor(() => expect(result.current.loading).toBe(false));
