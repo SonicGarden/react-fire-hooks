@@ -9,16 +9,19 @@ export const useAsync = <T>(fn: () => T | Promise<T>, deps: DependencyList = [])
   useEffect(() => {
     let isMounted = true;
 
-    try {
-      (async () => {
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        setData(null);
         const _data = await fn();
         isMounted && setData(_data);
-      })();
-    } catch (error) {
-      isMounted && setError(error);
-    } finally {
-      isMounted && setLoading(false);
-    }
+      } catch (error) {
+        isMounted && setError(error);
+      } finally {
+        isMounted && setLoading(false);
+      }
+    })();
 
     return () => {
       isMounted = false;
