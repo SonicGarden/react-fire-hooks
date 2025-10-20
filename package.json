@@ -1,7 +1,7 @@
 {
   "name": "@sonicgarden/react-fire-hooks",
   "type": "module",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "React hooks for Firebase",
   "main": "dist/cjs/index.js",
   "module": "dist/index.js",
@@ -17,7 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run build:esm && npm run build:cjs",
+    "build": "rm -rf dist && npm run build:esm && npm run build:cjs",
     "build:esm": "tsc",
     "build:cjs": "tsc --project tsconfig.cjs.json",
     "emulators:exec:test": "firebase emulators:exec 'pnpm test'",
