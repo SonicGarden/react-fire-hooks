@@ -61,6 +61,21 @@ describe('useDocumentsDataOnce', async () => {
     });
   });
 
+  it('clears data when the references change to empty array', async () => {
+    const { result, waitFor, rerender } = renderHook(({ refs }) => useDocumentsDataOnce(refs), {
+      initialProps: { refs: [fruitRef('apple'), fruitRef('banana')] },
+    });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+    expect(result.current.data).toEqual([{ name: 'apple' }, { name: 'banana' }]);
+    rerender({ refs: [] });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.data).toEqual([]);
+    });
+  });
+
   it('does not refetch data when the data is updated', async () => {
     const { result, waitFor } = renderHook(() => useDocumentsDataOnce([fruitRef('apple'), fruitRef('banana')]));
     await waitFor(() => expect(result.current.loading).toBe(false));

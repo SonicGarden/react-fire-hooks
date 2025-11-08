@@ -20,7 +20,10 @@ export const useCollectionData = <T>(
   useQueriesEffect(() => {
     let isMounted = true;
     if (!query) {
-      isMounted && setData([]);
+      if (isMounted) {
+        setData([]);
+        setLoading(undefined);
+      }
       return;
     }
 

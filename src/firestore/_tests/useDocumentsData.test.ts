@@ -71,6 +71,7 @@ describe('useDocumentsData', async () => {
     expect(result.current.data).toEqual([{ name: 'apple' }, { name: 'banana' }]);
     rerender({ refs: [] });
     await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
       expect(result.current.data).toEqual([]);
     });
   });

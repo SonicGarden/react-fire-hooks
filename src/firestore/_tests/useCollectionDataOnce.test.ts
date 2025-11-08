@@ -68,6 +68,27 @@ describe('useCollectionDataOnce', async () => {
     });
   });
 
+  it('clear data when the query changes to null', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionDataOnce>[0] },
+      ReturnType<typeof useCollectionDataOnce>
+    >(({ ref }) => useCollectionDataOnce(ref), {
+      initialProps: { ref: fruitsRef() },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'apple' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'banana' }));
+    });
+
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.data.length).toBe(0);
+    });
+  });
+
   it('does not refetch data when the data is updated', async () => {
     const { result, waitFor } = renderHook(() => useCollectionDataOnce(fruitsRef()));
     await waitFor(() => expect(result.current.loading).toBe(false));

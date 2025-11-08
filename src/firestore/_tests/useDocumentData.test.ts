@@ -68,6 +68,7 @@ describe('useDocumentData', async () => {
     expect(result.current.data).toEqual({ name: 'apple' });
     rerender({ ref: null });
     await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
       expect(result.current.data).toBe(undefined);
     });
   });

@@ -57,6 +57,22 @@ describe('useDocumentDataOnce', async () => {
     });
   });
 
+  it('clears data when the document reference changes to null', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useDocumentDataOnce>[0] | null },
+      ReturnType<typeof useDocumentDataOnce>
+    >(({ ref }) => useDocumentDataOnce(ref), { initialProps: { ref: fruitRef('apple') } });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+    expect(result.current.data).toEqual({ name: 'apple' });
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.data).toBe(undefined);
+    });
+  });
+
   it('does not refetch data when the data is updated', async () => {
     const { result, waitFor } = renderHook(() => useDocumentDataOnce(fruitRef('apple')));
     await waitFor(() => expect(result.current.loading).toBe(false));
