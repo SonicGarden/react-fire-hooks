@@ -23,6 +23,7 @@ export const useCollectionData = <T>(
       if (isMounted) {
         setData([]);
         setLoading(undefined);
+        setError(undefined);
       }
       return;
     }

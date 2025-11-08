@@ -23,6 +23,7 @@ export const useDocumentDataOnce = <T>(
       if (isMounted) {
         setData(undefined);
         setLoading(undefined);
+        setError(undefined);
       }
       return;
     }

@@ -108,4 +108,18 @@ describe('useCollectionDataOnce', async () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBeInstanceOf(FirebaseError);
   });
+
+  it('clears error when the query changes to null', async () => {
+    const { result, waitFor, rerender } = renderHook(({ ref }) => useCollectionDataOnce(ref, { throwError: false }), {
+      initialProps: { ref: animalsRef() },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
+
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.error).toBe(undefined);
+    });
+  });
 });

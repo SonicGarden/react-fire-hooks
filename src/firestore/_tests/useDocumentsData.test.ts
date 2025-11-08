@@ -122,4 +122,18 @@ describe('useDocumentsData', async () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.errors?.[0]).toBeInstanceOf(FirebaseError);
   });
+
+  it('clears errors when the references change to empty array', async () => {
+    const { result, waitFor, rerender } = renderHook(({ refs }) => useDocumentsData(refs, { throwError: false }), {
+      initialProps: { refs: [doc(animalsRef(), 'cat')] },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.errors?.length).toBeGreaterThan(0);
+
+    rerender({ refs: [] });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.errors).toEqual([]);
+    });
+  });
 });

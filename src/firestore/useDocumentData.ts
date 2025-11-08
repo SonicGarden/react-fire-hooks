@@ -23,6 +23,7 @@ export const useDocumentData = <T>(
       if (isMounted) {
         setData(undefined);
         setLoading(undefined);
+        setError(undefined);
       }
       return;
     }
