@@ -138,7 +138,10 @@ describe('useCollectionData', async () => {
   });
 
   it('clears error when the query changes to null', async () => {
-    const { result, waitFor, rerender } = renderHook(({ ref }) => useCollectionData(ref, { throwError: false }), {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionData>[0] },
+      ReturnType<typeof useCollectionData>
+    >(({ ref }) => useCollectionData(ref, { throwError: false }), {
       initialProps: { ref: animalsRef() },
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -152,7 +155,10 @@ describe('useCollectionData', async () => {
   });
 
   it('clears error when query succeeds after error', async () => {
-    const { result, waitFor, rerender } = renderHook(({ ref }) => useCollectionData(ref, { throwError: false }), {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionData>[0] },
+      ReturnType<typeof useCollectionData>
+    >(({ ref }) => useCollectionData(ref, { throwError: false }), {
       initialProps: { ref: animalsRef() },
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
@@ -168,7 +174,10 @@ describe('useCollectionData', async () => {
   });
 
   it('clears data when query fails after success', async () => {
-    const { result, waitFor, rerender } = renderHook(({ ref }) => useCollectionData(ref, { throwError: false }), {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionData>[0] },
+      ReturnType<typeof useCollectionData>
+    >(({ ref }) => useCollectionData(ref, { throwError: false }), {
       initialProps: { ref: fruitsRef() },
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
