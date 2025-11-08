@@ -19,7 +19,9 @@ describe('usePaginatedCollectionDataOnce', async () => {
       addDoc(fruitsRef(), { name: 'cherry' }),
       addDoc(fruitsRef(), { name: 'date' }),
       addDoc(vegetablesRef(), { name: 'carrot' }),
+      addDoc(vegetablesRef(), { name: 'onion' }),
       addDoc(vegetablesRef(), { name: 'potato' }),
+      addDoc(vegetablesRef(), { name: 'tomato' }),
     ]);
   });
 
@@ -69,7 +71,53 @@ describe('usePaginatedCollectionDataOnce', async () => {
     await waitFor(() => {
       expect(result.current.data.length).toBe(2);
       expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'carrot' }));
-      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'potato' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'onion' }));
+    });
+  });
+
+  it('clears data when the query changes to null', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof usePaginatedCollectionDataOnce>[0] },
+      ReturnType<typeof usePaginatedCollectionDataOnce>
+    >(({ ref }) => usePaginatedCollectionDataOnce(ref, { limit: 2 }), {
+      initialProps: { ref: query(fruitsRef(), orderBy('name')) },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'apple' }));
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'banana' }));
+    });
+
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.data.length).toBe(0);
+    });
+  });
+
+  it('resets pagination when the query changes', async () => {
+    const { result, waitFor, rerender } = renderHook(({ ref }) => usePaginatedCollectionDataOnce(ref, { limit: 2 }), {
+      initialProps: { ref: query(fruitsRef(), orderBy('name')) },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.hasMore).toBe(true);
+    });
+
+    result.current.loadMore();
+    await waitFor(() => expect(result.current.loading).toBe(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(4);
+    });
+
+    rerender({ ref: query(vegetablesRef(), orderBy('name')) });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.hasMore).toBe(true);
     });
   });
 
