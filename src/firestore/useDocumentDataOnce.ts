@@ -34,10 +34,12 @@ export const useDocumentDataOnce = <T>(
         if (!isMounted) return;
         setData(snapshot.data(snapshotOptions));
         setLoading(false);
+        setError(undefined);
       })
       .catch((error) => {
         if (throwError) throw error;
         if (!isMounted) return;
+        setData(undefined);
         setError(error);
         setLoading(false);
       });

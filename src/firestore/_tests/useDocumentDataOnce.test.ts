@@ -104,4 +104,36 @@ describe('useDocumentDataOnce', async () => {
       expect(result.current.error).toBe(undefined);
     });
   });
+
+  it('clears error when reference succeeds after error', async () => {
+    const { result, waitFor, rerender } = renderHook(({ ref }) => useDocumentDataOnce(ref, { throwError: false }), {
+      initialProps: { ref: doc(animalsRef(), 'cat') },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
+    expect(result.current.data).toBe(undefined);
+
+    rerender({ ref: fruitRef('apple') });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ name: 'apple' });
+      expect(result.current.error).toBe(undefined);
+    });
+  });
+
+  it('clears data when reference fails after success', async () => {
+    const { result, waitFor, rerender } = renderHook(({ ref }) => useDocumentDataOnce(ref, { throwError: false }), {
+      initialProps: { ref: fruitRef('apple') },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ name: 'apple' });
+      expect(result.current.error).toBe(undefined);
+    });
+
+    rerender({ ref: doc(animalsRef(), 'cat') });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toBe(undefined);
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
+  });
 });

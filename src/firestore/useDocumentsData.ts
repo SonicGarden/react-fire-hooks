@@ -29,23 +29,31 @@ export const useDocumentsData = <T>(
     }
 
     setLoading(true);
+    setData([]);
+    setErrors([]);
     const unsubscribes: Unsubscribe[] = [];
     const fetchDataPromises = refs.map((ref, index) => {
       return new Promise<void>((resolve, reject) => {
         const unsubscribe = onSnapshot(
           ref,
           (snapshot) => {
-            if (isMounted)
+            if (isMounted) {
               setData((prevData) => {
                 const newData = [...prevData];
                 newData[index] = snapshot.data(snapshotOptions);
                 return newData;
               });
+            }
             resolve();
           },
           (error) => {
             if (throwError) reject(error);
             if (isMounted) {
+              setData((prevData) => {
+                const newData = [...prevData];
+                newData[index] = undefined;
+                return newData;
+              });
               setErrors((prev) => [...prev, error]);
               setLoading(false);
             }

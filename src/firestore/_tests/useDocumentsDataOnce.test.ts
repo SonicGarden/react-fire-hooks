@@ -109,4 +109,36 @@ describe('useDocumentsDataOnce', async () => {
       expect(result.current.errors).toEqual([]);
     });
   });
+
+  it('clears errors when references succeed after error', async () => {
+    const { result, waitFor, rerender } = renderHook(({ refs }) => useDocumentsDataOnce(refs, { throwError: false }), {
+      initialProps: { refs: [doc(animalsRef(), 'cat')] },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.errors?.length).toBeGreaterThan(0);
+    expect(result.current.data).toEqual([]);
+
+    rerender({ refs: [fruitRef('apple'), fruitRef('banana')] });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual([{ name: 'apple' }, { name: 'banana' }]);
+      expect(result.current.errors).toEqual([]);
+    });
+  });
+
+  it('clears data when references fail after success', async () => {
+    const { result, waitFor, rerender } = renderHook(({ refs }) => useDocumentsDataOnce(refs, { throwError: false }), {
+      initialProps: { refs: [fruitRef('apple'), fruitRef('banana')] },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual([{ name: 'apple' }, { name: 'banana' }]);
+      expect(result.current.errors).toEqual([]);
+    });
+
+    rerender({ refs: [doc(animalsRef(), 'cat')] });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual([]);
+    expect(result.current.errors?.length).toBeGreaterThan(0);
+  });
 });
