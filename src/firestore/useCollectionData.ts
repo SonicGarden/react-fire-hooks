@@ -23,6 +23,7 @@ export const useCollectionData = <T>(
       if (isMounted) {
         setData([]);
         setLoading(undefined);
+        setError(undefined);
       }
       return;
     }
@@ -34,10 +35,12 @@ export const useCollectionData = <T>(
         if (!isMounted) return;
         setData(snapshot.docs.map((doc) => doc.data(snapshotOptions)));
         setLoading(false);
+        setError(undefined);
       },
       (error) => {
         if (throwError) throw error;
         if (!isMounted) return;
+        setData([]);
         setError(error);
         setLoading(false);
       },

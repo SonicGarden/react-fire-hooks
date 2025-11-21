@@ -23,6 +23,7 @@ export const useDocumentsDataOnce = <T>(
       if (isMounted) {
         setData([]);
         setLoading(undefined);
+        setErrors([]);
       }
       return;
     }
@@ -33,10 +34,12 @@ export const useDocumentsDataOnce = <T>(
         if (!isMounted) return;
         setData(snapshots.map((snapshot) => snapshot.data(snapshotOptions)));
         setLoading(false);
+        setErrors([]);
       })
       .catch((error) => {
         if (throwError) throw error;
         if (!isMounted) return;
+        setData([]);
         setErrors((prev) => [...prev, error]);
         setLoading(false);
       });

@@ -108,4 +108,59 @@ describe('useCollectionDataOnce', async () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBeInstanceOf(FirebaseError);
   });
+
+  it('clears error when the query changes to null', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionDataOnce>[0] },
+      ReturnType<typeof useCollectionDataOnce>
+    >(({ ref }) => useCollectionDataOnce(ref, { throwError: false }), {
+      initialProps: { ref: animalsRef() },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
+
+    rerender({ ref: null });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
+      expect(result.current.error).toBe(undefined);
+    });
+  });
+
+  it('clears error when query succeeds after error', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionDataOnce>[0] },
+      ReturnType<typeof useCollectionDataOnce>
+    >(({ ref }) => useCollectionDataOnce(ref, { throwError: false }), {
+      initialProps: { ref: animalsRef() },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
+    expect(result.current.data).toEqual([]);
+
+    rerender({ ref: fruitsRef() });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.error).toBe(undefined);
+    });
+  });
+
+  it('clears data when query fails after success', async () => {
+    const { result, waitFor, rerender } = renderHook<
+      { ref: Parameters<typeof useCollectionDataOnce>[0] },
+      ReturnType<typeof useCollectionDataOnce>
+    >(({ ref }) => useCollectionDataOnce(ref, { throwError: false }), {
+      initialProps: { ref: fruitsRef() },
+    });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.error).toBe(undefined);
+    });
+
+    rerender({ ref: animalsRef() });
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).toEqual([]);
+    expect(result.current.error).toBeInstanceOf(FirebaseError);
+  });
 });
