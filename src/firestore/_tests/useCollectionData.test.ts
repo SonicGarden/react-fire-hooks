@@ -84,6 +84,7 @@ describe('useCollectionData', async () => {
 
     rerender({ ref: null });
     await waitFor(() => {
+      expect(result.current.loading).toBe(undefined);
       expect(result.current.data.length).toBe(0);
     });
   });

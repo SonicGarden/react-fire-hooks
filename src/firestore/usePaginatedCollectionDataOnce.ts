@@ -2,6 +2,7 @@ import { limit, query } from 'firebase/firestore';
 import { useCallback, useMemo, useState } from 'react';
 import { useDeepCompareEffect } from '../utils/index.js';
 import { useCollectionDataOnce } from './useCollectionDataOnce.js';
+import { useQueriesEffect } from './useQueriesEffect.js';
 import type { Query, SnapshotOptions } from 'firebase/firestore';
 
 export type UsePaginatedCollectionDataOnceOptions = {
@@ -33,6 +34,12 @@ export const usePaginatedCollectionDataOnce = <T>(
     if (loading) return;
     setData(_data);
   }, [loading, _data]);
+
+  // NOTE: Reset pagination when query changes.
+  useQueriesEffect(() => {
+    setData([]);
+    setPage(defaultPage);
+  }, [_query]);
 
   return { data: dataWithoutLast, loading, hasMore, loadMore, error };
 };

@@ -20,7 +20,10 @@ export const useDocumentsData = <T>(
   useRefsEffect(() => {
     let isMounted = true;
     if (!refs || refs.length === 0) {
-      isMounted && setData([]);
+      if (isMounted) {
+        setData([]);
+        setLoading(undefined);
+      }
       return;
     }
 
