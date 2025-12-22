@@ -145,4 +145,33 @@ describe('useDocumentDataOnce', async () => {
     expect(result.current.data).toBe(undefined);
     expect(result.current.error).toBeInstanceOf(FirebaseError);
   });
+
+  it('reloads data when reload is called', async () => {
+    const { result, waitFor } = renderHook(() => useDocumentDataOnce(fruitRef('apple')));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ name: 'apple' });
+    });
+
+    await updateDoc(fruitRef('apple'), { color: 'red' });
+    expect(result.current.data).toEqual({ name: 'apple' });
+
+    result.current.reload();
+    await waitFor(() => expect(result.current.loading).toBe(true));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data).toEqual({ name: 'apple', color: 'red' });
+    });
+  });
+
+  it('does not reload when reference is null', async () => {
+    const { result } = renderHook(() => useDocumentDataOnce(null));
+    expect(result.current.loading).toBe(undefined);
+    expect(result.current.data).toBe(undefined);
+
+    result.current.reload();
+    await setTimeout(100);
+    expect(result.current.loading).toBe(undefined);
+    expect(result.current.data).toBe(undefined);
+  });
 });

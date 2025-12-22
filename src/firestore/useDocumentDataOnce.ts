@@ -1,5 +1,5 @@
 import { getDoc } from 'firebase/firestore';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRefsEffect } from './useRefsEffect.js';
 import type { FirebaseError } from 'firebase/app';
 import type { DocumentReference, SnapshotOptions } from 'firebase/firestore';
@@ -16,11 +16,11 @@ export const useDocumentDataOnce = <T>(
   const [data, setData] = useState<T | undefined>();
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirebaseError | undefined>();
+  const isMountedRef = useRef(true);
 
-  useRefsEffect(() => {
-    let isMounted = true;
+  const fetchData = () => {
     if (!ref) {
-      if (isMounted) {
+      if (isMountedRef.current) {
         setData(undefined);
         setLoading(undefined);
         setError(undefined);
@@ -31,23 +31,32 @@ export const useDocumentDataOnce = <T>(
     setLoading(true);
     getDoc(ref)
       .then((snapshot) => {
-        if (!isMounted) return;
+        if (!isMountedRef.current) return;
         setData(snapshot.data(snapshotOptions));
         setLoading(false);
         setError(undefined);
       })
       .catch((error) => {
         if (throwError) throw error;
-        if (!isMounted) return;
+        if (!isMountedRef.current) return;
         setData(undefined);
         setError(error);
         setLoading(false);
       });
+  };
+
+  const reload = () => {
+    fetchData();
+  };
+
+  useRefsEffect(() => {
+    isMountedRef.current = true;
+    fetchData();
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
     };
   }, [ref]);
 
-  return { data, loading, error };
+  return { data, loading, error, reload };
 };
