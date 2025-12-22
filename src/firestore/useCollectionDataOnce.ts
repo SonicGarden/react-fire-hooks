@@ -1,5 +1,5 @@
 import { getDocs } from 'firebase/firestore';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useQueriesEffect } from './useQueriesEffect.js';
 import type { FirebaseError } from 'firebase/app';
 import type { Query, SnapshotOptions } from 'firebase/firestore';
@@ -16,11 +16,11 @@ export const useCollectionDataOnce = <T>(
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState<boolean | undefined>();
   const [error, setError] = useState<FirebaseError | undefined>();
+  const isMountedRef = useRef(true);
 
-  useQueriesEffect(() => {
-    let isMounted = true;
+  const fetchData = useCallback(() => {
     if (!query) {
-      if (isMounted) {
+      if (isMountedRef.current) {
         setData([]);
         setLoading(undefined);
         setError(undefined);
@@ -31,23 +31,32 @@ export const useCollectionDataOnce = <T>(
     setLoading(true);
     getDocs(query)
       .then((snapshot) => {
-        if (!isMounted) return;
+        if (!isMountedRef.current) return;
         setData(snapshot.docs.map((doc) => doc.data(snapshotOptions)));
         setLoading(false);
         setError(undefined);
       })
       .catch((error) => {
         if (throwError) throw error;
-        if (!isMounted) return;
+        if (!isMountedRef.current) return;
         setData([]);
         setError(error);
         setLoading(false);
       });
+  }, [query, snapshotOptions, throwError]);
+
+  const reload = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useQueriesEffect(() => {
+    isMountedRef.current = true;
+    fetchData();
 
     return () => {
-      isMounted = false;
+      isMountedRef.current = false;
     };
   }, [query]);
 
-  return { data, loading, error };
+  return { data, loading, error, reload };
 };

@@ -163,4 +163,34 @@ describe('useCollectionDataOnce', async () => {
     expect(result.current.data).toEqual([]);
     expect(result.current.error).toBeInstanceOf(FirebaseError);
   });
+
+  it('reloads data when reload is called', async () => {
+    const { result, waitFor } = renderHook(() => useCollectionDataOnce(fruitsRef()));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(2);
+      expect(result.current.error).toBe(undefined);
+    });
+
+    await addDoc(fruitsRef(), { name: 'cherry' });
+    expect(result.current.data.length).toBe(2);
+
+    result.current.reload();
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    await waitFor(() => {
+      expect(result.current.data.length).toBe(3);
+      expect(result.current.data).toContainEqual(expect.objectContaining({ name: 'cherry' }));
+    });
+  });
+
+  it('does not reload when query is null', async () => {
+    const { result } = renderHook(() => useCollectionDataOnce(null));
+    expect(result.current.loading).toBe(undefined);
+    expect(result.current.data).toEqual([]);
+
+    result.current.reload();
+    await setTimeout(100);
+    expect(result.current.loading).toBe(undefined);
+    expect(result.current.data).toEqual([]);
+  });
 });
