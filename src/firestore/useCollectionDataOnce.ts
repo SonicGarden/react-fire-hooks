@@ -1,5 +1,5 @@
 import { getDocs } from 'firebase/firestore';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useQueriesEffect } from './useQueriesEffect.js';
 import type { FirebaseError } from 'firebase/app';
 import type { Query, SnapshotOptions } from 'firebase/firestore';
@@ -18,7 +18,7 @@ export const useCollectionDataOnce = <T>(
   const [error, setError] = useState<FirebaseError | undefined>();
   const isMountedRef = useRef(true);
 
-  const fetchData = () => {
+  const fetchData = useCallback(() => {
     if (!query) {
       if (isMountedRef.current) {
         setData([]);
@@ -43,11 +43,11 @@ export const useCollectionDataOnce = <T>(
         setError(error);
         setLoading(false);
       });
-  };
+  }, [query, snapshotOptions, throwError]);
 
-  const reload = () => {
+  const reload = useCallback(() => {
     fetchData();
-  };
+  }, [fetchData]);
 
   useQueriesEffect(() => {
     isMountedRef.current = true;
