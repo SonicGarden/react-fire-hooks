@@ -1,7 +1,13 @@
 import { exec } from 'child_process';
 import { getApps, initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import {
+  connectFirestoreEmulator,
+  getFirestore,
+  initializeFirestore,
+  memoryEagerGarbageCollector,
+  memoryLocalCache,
+} from 'firebase/firestore';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
 import { initializeTestAdminApp } from './admin';
 
@@ -27,6 +33,8 @@ const initializeTestApp = () => {
     messagingSenderId: '',
     appId: '',
   });
+  // firebase v11 から既定の LRU GC はリスナー解除後もキャッシュを残し、前のテストのドキュメントが混ざるため Eager GC にする
+  initializeFirestore(app, { localCache: memoryLocalCache({ garbageCollector: memoryEagerGarbageCollector() }) });
   connectAuthEmulator(getAuth(), `http://${HOST}:${AUTH_PORT}`, { disableWarnings: true });
   connectFirestoreEmulator(getFirestore(), HOST, FIRESTORE_PORT);
   connectStorageEmulator(getStorage(), HOST, STORAGE_PORT);
